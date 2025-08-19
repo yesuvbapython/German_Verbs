@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <title>100 German Verbs • IPA + Easy Pronunciation + Audio</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <style>
+    :root{
+      --fg:#0f172a; --muted:#64748b; --card:#f8fafc; --border:#e2e8f0; --bg:#ffffff;
+      --accent:#2563eb;
+    }
+    @media (prefers-color-scheme: dark){
+      :root{ --fg:#e5e7eb; --muted:#94a3b8; --card:#0b1220; --border:#1e293b; --bg:#070b14; --accent:#60a5fa; }
+    }
+    html,body{margin:0;background:var(--bg);color:var(--fg);font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,"Apple Color Emoji","Segoe UI Emoji";line-height:1.6}
+    header{position:sticky;top:0;background:var(--bg);border-bottom:1px solid var(--border);z-index:2;padding:18px 12px;text-align:center}
+    h1{margin:0 0 6px 0;font-size:clamp(20px,3vw,28px)}
+    .sub{margin:0;color:var(--muted)}
+    .controls{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-top:12px}
+    input[type=search]{padding:10px 12px;border:1px solid var(--border);border-radius:12px;min-width:280px;background:var(--bg);color:var(--fg)}
+    .count{color:var(--muted);font-size:13px;align-self:center}
+    main{max-width:980px;margin:18px auto 40px;padding:0 12px}
+    .verb{background:var(--card);border:1px solid var(--border);border-radius:16px;margin:14px 0;padding:14px 14px 8px}
+    .verb-head{display:grid;grid-template-columns:1fr auto;gap:10px;align-items:center}
+    .verb-title{margin:0;font-size:18px}
+    .meaning{color:var(--muted);font-style:italic}
+    .rightline{display:flex;gap:10px;align-items:center;justify-content:flex-end;flex-wrap:wrap}
+    .ipa{color:var(--muted)}
+    .easy{color:var(--muted)}
+    .say{cursor:pointer;border:1px solid var(--border);background:var(--bg);padding:6px 10px;border-radius:10px}
+    .say:hover{background:rgba(99,102,241,0.07)}
+    .examples{margin-top:10px;display:grid;gap:8px}
+    /* sentence rows: left = German + button, right = easy phonetic */
+    .ex-row{display:grid;grid-template-columns:minmax(220px,1fr) auto;gap:10px}
+    .ex-left b{margin-right:6px}
+    .ex-right{text-align:right;color:var(--muted)}
+    footer{text-align:center;color:var(--muted);border-top:1px solid var(--border);padding:20px}
+  </style>
+</head>
+<body>
+  <header>
+    <h1>100 German Verbs</h1>
+    <p class="sub">Click 🔊 to hear verbs & full sentences. Easy pronunciations appear on the <b>right</b> (e.g., <i>sein → zain</i>).</p>
+    <div class="controls">
+      <input id="search" type="search" placeholder="Search verb / meaning / sentence…" />
+      <span id="count" class="count"></span>
+    </div>
+  </header>
+
+  <main id="list"></main>
+  <footer>Built for quick study • Uses your browser’s German voice (de-DE)</footer>
+
+  <script>
+    // ===== Speech =====
+    function speak(text){
+      try{ speechSynthesis.cancel(); }catch(_){}
+      const u = new SpeechSynthesisUtterance(text);
+      u.lang = "de-DE";
+      u.rate = 0.95;
+      speechSynthesis.speak(u);
+    }
+
+    // ===== Easy English-style phonetics (readable rules) =====
+    // Target: friendly, memorable approximations (sein→zain, Deutsch→doytsh, sprechen→shprekhən)
+    function easyDePronounce(input){
+      if(!input) return "";
+      // Normalize
+      let s = input
+        .replace(/[Ää]/g,'ä').replace(/[Öö]/g,'ö').replace(/[Üü]/g,'ü').replace(/ẞ/g,'ß');
+
+      // Word-start Sp/St
+      s = s.replace(/\bSt/g,'Sht').replace(/\bst/g,'sht');
+      s = s.replace(/\bSp/g,'Shp').replace(/\bsp/g,'shp');
+
+      // Order matters: handle longer clusters first
+      s = s.replace(/sch/gi, m => m[0]==='S' ? 'Sh' : 'sh'); // sch → sh
+      s = s.replace(/tsch/gi,'ch');                           // deutsch → doych → doytsh (after steps)
+      s = s.replace(/ch/gi,'kh');                             // rough "ch"
+      s = s.replace(/qu/gi,'kv');
+      s = s.replace(/ph/gi,'f');
+
+      // Vowel combos
+      s = s.replace(/äu|eu/gi,'oy');                          // Deutsch → doytsh
+      s = s.replace(/ei/gi,'ain');                            // sein → zain
+      s = s.replace(/ie/gi,'ee');
+
+      // Singles
+      s = s.replace(/ä/gi,'eh');
+      s = s.replace(/ö/gi,'uh');
+      s = s.replace(/ü/gi,'ue');
+      s = s.replace(/ß/g,'ss');
+      s = s.replace(/j/gi,'y');
+      s = s.replace(/w/gi,'v');                               // Wasser → vasser
+      s = s.replace(/z/gi,'ts');                              // zu → tsu
+      s = s.replace(/v/gi,'f');                               // Vogel → fogle
+      s = s.replace(/th/gi,'t');
+
+      // Clean spaces
+      s = s.replace(/\s+/g,' ').trim();
+      return s.toLowerCase();
+    }
+
+    // ===== 100 verbs (A1–B1) =====
+    // Each item: id, verb, ipa, meaning, examples: [[DE, EN], [DE, EN]]
+    const verbs = [
+      // 1–10
+      {id:1, verb:"sein", ipa:"zaɪ̯n", meaning:"to be", examples:[["Ich bin müde.","I am tired."],["Es ist spät.","It is late."]]},
+      {id:2, verb:"haben", ipa:"ˈhaːbən", meaning:"to have", examples:[["Ich habe Zeit.","I have time."],["Sie hat ein Auto.","She has a car."]]},
+      {id:3, verb:"werden", ipa:"ˈveːʁdən", meaning:"to become", examples:[["Ich werde müde.","I’m getting tired."],["Es wird kalt.","It’s getting cold."]]},
+      {id:4, verb:"machen", ipa:"ˈmaxən", meaning:"to do; make", examples:[["Was machst du?","What are you doing?"],["Ich mache Hausaufgaben.","I’m doing homework."]]},
+      {id:5, verb:"gehen", ipa:"ˈɡeːən", meaning:"to go", examples:[["Wir gehen nach Hause.","We are going home."],["Ich gehe spazieren.","I go for a walk."]]},
+      {id:6, verb:"kommen", ipa:"ˈkɔmən", meaning:"to come", examples:[["Kommst du mit?","Are you coming along?"],["Er kommt aus Indien.","He comes from India."]]},
+      {id:7, verb:"sagen", ipa:"ˈzaːɡən", meaning:"to say", examples:[["Ich sage die Wahrheit.","I tell the truth."],["Was sagst du?","What are you saying?"]]},
+      {id:8, verb:"geben", ipa:"ˈɡeːbən", meaning:"to give", examples:[["Er gibt mir ein Buch.","He gives me a book."],["Kannst du mir Wasser geben?","Can you give me water?"]]},
+      {id:9, verb:"nehmen", ipa:"ˈneːmən", meaning:"to take", examples:[["Ich nehme den Bus.","I take the bus."],["Nimm das Geld!","Take the money!"]]},
+      {id:10, verb:"finden", ipa:"ˈfɪndən", meaning:"to find", examples:[["Ich finde den Schlüssel.","I find the key."],["Hast du meine Brille gefunden?","Did you find my glasses?"]]},
+
+      // 11–20
+      {id:11, verb:"denken", ipa:"ˈdɛŋkən", meaning:"to think", examples:[["Ich denke an dich.","I’m thinking of you."],["Denkst du, dass es regnet?","Do you think it will rain?"]]},
+      {id:12, verb:"wissen", ipa:"ˈvɪsən", meaning:"to know (a fact)", examples:[["Ich weiß die Antwort.","I know the answer."],["Weißt du, wo er ist?","Do you know where he is?"]]},
+      {id:13, verb:"kennen", ipa:"ˈkɛnən", meaning:"to know (someone/place)", examples:[["Ich kenne ihn gut.","I know him well."],["Kennst du Berlin?","Do you know Berlin?"]]},
+      {id:14, verb:"bleiben", ipa:"ˈblaɪ̯bən", meaning:"to stay", examples:[["Ich bleibe zu Hause.","I’m staying at home."],["Bleib ruhig!","Stay calm!"]]},
+      {id:15, verb:"arbeiten", ipa:"ˈaʁbaɪ̯tən", meaning:"to work", examples:[["Er arbeitet im Büro.","He works in the office."],["Ich arbeite viel.","I work a lot."]]},
+      {id:16, verb:"lernen", ipa:"ˈlɛʁnən", meaning:"to learn", examples:[["Wir lernen Deutsch.","We are learning German."],["Ich lerne schnell.","I learn quickly."]]},
+      {id:17, verb:"spielen", ipa:"ˈʃpiːlən", meaning:"to play", examples:[["Die Kinder spielen Fußball.","The children play football."],["Ich spiele Gitarre.","I play guitar."]]},
+      {id:18, verb:"sehen", ipa:"ˈzeːən", meaning:"to see", examples:[["Ich sehe die Sterne.","I see the stars."],["Kannst du das Bild sehen?","Can you see the picture?"]]},
+      {id:19, verb:"sprechen", ipa:"ˈʃprɛçən", meaning:"to speak", examples:[["Er spricht Deutsch.","He speaks German."],["Kannst du Englisch sprechen?","Can you speak English?"]]},
+      {id:20, verb:"hören", ipa:"ˈhøːʁən", meaning:"to hear; listen", examples:[["Ich höre Musik.","I listen to music."],["Hörst du mich?","Do you hear me?"]]},
+
+      // 21–30
+      {id:21, verb:"lesen", ipa:"ˈleːzən", meaning:"to read", examples:[["Sie liest ein Buch.","She is reading a book."],["Ich lese die Zeitung.","I read the newspaper."]]},
+      {id:22, verb:"schreiben", ipa:"ˈʃʁaɪ̯bən", meaning:"to write", examples:[["Ich schreibe einen Brief.","I am writing a letter."],["Sie schreibt eine E-Mail.","She writes an email."]]},
+      {id:23, verb:"essen", ipa:"ˈʔɛsən", meaning:"to eat", examples:[["Wir essen Pizza.","We are eating pizza."],["Ich esse gern Obst.","I like eating fruit."]]},
+      {id:24, verb:"trinken", ipa:"ˈtʁɪŋkən", meaning:"to drink", examples:[["Ich trinke Wasser.","I drink water."],["Sie trinken Kaffee.","They drink coffee."]]},
+      {id:25, verb:"schlafen", ipa:"ˈʃlaːfən", meaning:"to sleep", examples:[["Das Kind schläft.","The child is sleeping."],["Ich schlafe acht Stunden.","I sleep eight hours."]]},
+      {id:26, verb:"fahren", ipa:"ˈfaːʁən", meaning:"to drive; go", examples:[["Wir fahren nach München.","We are driving to Munich."],["Ich fahre mit dem Bus.","I go by bus."]]},
+      {id:27, verb:"laufen", ipa:"ˈlaʊ̯fən", meaning:"to run; walk", examples:[["Er läuft schnell.","He runs fast."],["Ich laufe im Park.","I run in the park."]]},
+      {id:28, verb:"fliegen", ipa:"ˈfliːɡən", meaning:"to fly", examples:[["Wir fliegen nach Berlin.","We fly to Berlin."],["Das Flugzeug fliegt hoch.","The airplane flies high."]]},
+      {id:29, verb:"schwimmen", ipa:"ˈʃvɪmən", meaning:"to swim", examples:[["Ich schwimme im See.","I swim in the lake."],["Wir schwimmen jeden Morgen.","We swim every morning."]]},
+      {id:30, verb:"sitzen", ipa:"ˈzɪtsən", meaning:"to sit", examples:[["Sie sitzt auf dem Stuhl.","She sits on the chair."],["Wir sitzen im Café.","We’re sitting in the café."]]},
+
+      // 31–40
+      {id:31, verb:"stehen", ipa:"ˈʃteːən", meaning:"to stand", examples:[["Ich stehe an der Haltestelle.","I’m standing at the bus stop."],["Das Buch steht im Regal.","The book stands on the shelf."]]},
+      {id:32, verb:"liegen", ipa:"ˈliːɡən", meaning:"to lie (be located)", examples:[["Das Handy liegt auf dem Tisch.","The phone lies on the table."],["Berlin liegt in Deutschland.","Berlin is located in Germany."]]},
+      {id:33, verb:"stellen", ipa:"ˈʃtɛlən", meaning:"to put/place upright", examples:[["Ich stelle die Flasche auf den Tisch.","I put the bottle on the table."],["Stell bitte den Stuhl hierher.","Please put the chair here."]]},
+      {id:34, verb:"legen", ipa:"ˈleːɡən", meaning:"to lay; place flat", examples:[["Ich lege das Buch auf den Tisch.","I lay the book on the table."],["Leg das Handy hin.","Put the phone down."]]},
+      {id:35, verb:"setzen", ipa:"ˈzɛtsən", meaning:"to set; seat", examples:[["Ich setze das Kind auf den Stuhl.","I seat the child on the chair."],["Setz dich, bitte.","Sit down, please."]]},
+      {id:36, verb:"bringen", ipa:"ˈbʁɪŋən", meaning:"to bring", examples:[["Ich bringe den Wein.","I’m bringing the wine."],["Kannst du das Buch bringen?","Can you bring the book?"]]},
+      {id:37, verb:"zeigen", ipa:"ˈtsaɪ̯ɡən", meaning:"to show", examples:[["Zeigst du mir den Weg?","Will you show me the way?"],["Er zeigt mir Fotos.","He shows me photos."]]},
+      {id:38, verb:"fragen", ipa:"ˈfʁaːɡən", meaning:"to ask", examples:[["Ich frage den Lehrer.","I ask the teacher."],["Darf ich etwas fragen?","May I ask something?"]]},
+      {id:39, verb:"antworten", ipa:"ˈantvɔʁtən", meaning:"to answer", examples:[["Er antwortet sofort.","He answers immediately."],["Bitte antworte mir!","Please answer me!"]]},
+      {id:40, verb:"versuchen", ipa:"fɛɐ̯ˈzuːxən", meaning:"to try; attempt", examples:[["Ich versuche es nochmal.","I’ll try again."],["Versuche, ruhig zu bleiben.","Try to stay calm."]]},
+
+      // 41–50
+      {id:41, verb:"erklären", ipa:"ɛʁˈklɛːʁən", meaning:"to explain", examples:[["Er erklärt die Regeln.","He explains the rules."],["Kannst du das erklären?","Can you explain that?"]]},
+      {id:42, verb:"erzählen", ipa:"ɛʁˈtsɛːlən", meaning:"to tell; narrate", examples:[["Sie erzählt eine Geschichte.","She tells a story."],["Er erzählt von seiner Reise.","He talks about his trip."]]},
+      {id:43, verb:"verstehen", ipa:"fɛɐ̯ˈʃteːən", meaning:"to understand", examples:[["Ich verstehe dich.","I understand you."],["Wir verstehen die Aufgabe.","We understand the task."]]},
+      {id:44, verb:"bekommen", ipa:"bəˈkɔmən", meaning:"to get; receive", examples:[["Ich bekomme eine E-Mail.","I’m getting an email."],["Er bekommt ein Geschenk.","He receives a gift."]]},
+      {id:45, verb:"brauchen", ipa:"ˈbʁaʊ̯xən", meaning:"to need", examples:[["Ich brauche Hilfe.","I need help."],["Wir brauchen mehr Zeit.","We need more time."]]},
+      {id:46, verb:"benutzen", ipa:"bəˈnʊt͡sən", meaning:"to use", examples:[["Ich benutze mein Handy.","I use my phone."],["Benutze bitte die Maske.","Please use the mask."]]},
+      {id:47, verb:"suchen", ipa:"ˈzuːxən", meaning:"to look for", examples:[["Ich suche meine Tasche.","I’m looking for my bag."],["Er sucht eine Wohnung.","He is looking for an apartment."]]},
+      {id:48, verb:"öffnen", ipa:"ˈʔœfnən", meaning:"to open", examples:[["Ich öffne das Fenster.","I open the window."],["Der Laden öffnet um neun.","The shop opens at nine."]]},
+      {id:49, verb:"schließen", ipa:"ˈʃliːsən", meaning:"to close", examples:[["Bitte schließe die Tür.","Please close the door."],["Das Museum schließt um sechs.","The museum closes at six."]]},
+      {id:50, verb:"kaufen", ipa:"ˈkaʊ̯fən", meaning:"to buy", examples:[["Ich kaufe ein Auto.","I am buying a car."],["Er kauft Gemüse.","He buys vegetables."]]},
+
+      // 51–60
+      {id:51, verb:"verkaufen", ipa:"fɛɐ̯ˈkaʊ̯fən", meaning:"to sell", examples:[["Sie verkauft Kleidung.","She sells clothes."],["Ich verkaufe mein Fahrrad.","I am selling my bike."]]},
+      {id:52, verb:"bezahlen", ipa:"bəˈtsaːlən", meaning:"to pay", examples:[["Ich bezahle die Rechnung.","I pay the bill."],["Kann ich mit Karte bezahlen?","Can I pay by card?"]]},
+      {id:53, verb:"kosten", ipa:"ˈkɔstən", meaning:"to cost", examples:[["Es kostet zehn Euro.","It costs ten euros."],["Wie viel kostet das?","How much does that cost?"]]},
+      {id:54, verb:"helfen", ipa:"ˈhɛlfən", meaning:"to help", examples:[["Kannst du mir helfen?","Can you help me?"],["Er hilft seiner Mutter.","He helps his mother."]]},
+      {id:55, verb:"beginnen", ipa:"bəˈɡɪnən", meaning:"to begin", examples:[["Der Film beginnt um acht.","The film starts at eight."],["Ich beginne mit der Arbeit.","I’m starting work."]]},
+      {id:56, verb:"enden", ipa:"ˈɛndən", meaning:"to end", examples:[["Der Kurs endet morgen.","The course ends tomorrow."],["Das Spiel endet um zehn.","The game ends at ten."]]},
+      {id:57, verb:"warten", ipa:"ˈvaʁtən", meaning:"to wait", examples:[["Ich warte auf den Bus.","I’m waiting for the bus."],["Bitte warte hier.","Please wait here."]]},
+      {id:58, verb:"starten", ipa:"ˈʃtaʁtən", meaning:"to start; launch", examples:[["Ich starte das Programm.","I start the program."],["Das Auto startet nicht.","The car doesn’t start."]]},
+      {id:59, verb:"stoppen", ipa:"ˈʃtɔpən", meaning:"to stop", examples:[["Ich stoppe die Maschine.","I stop the machine."],["Der Bus stoppt hier.","The bus stops here."]]},
+      {id:60, verb:"reisen", ipa:"ˈʁaɪ̯zən", meaning:"to travel", examples:[["Ich reise nach Italien.","I travel to Italy."],["Wir reisen gern im Sommer.","We like to travel in summer."]]},
+
+      // 61–70
+      {id:61, verb:"wohnen", ipa:"ˈvoːnən", meaning:"to live; reside", examples:[["Ich wohne in Berlin.","I live in Berlin."],["Wir wohnen zusammen.","We live together."]]},
+      {id:62, verb:"leben", ipa:"ˈleːbən", meaning:"to live (be alive)", examples:[["Ich lebe in Indien.","I live in India."],["Sie lebt gesund.","She lives healthily."]]},
+      {id:63, verb:"lieben", ipa:"ˈliːbən", meaning:"to love", examples:[["Ich liebe Musik.","I love music."],["Er liebt seine Familie.","He loves his family."]]},
+      {id:64, verb:"mögen", ipa:"ˈmøːɡən", meaning:"to like", examples:[["Ich mag Kaffee.","I like coffee."],["Magst du Schokolade?","Do you like chocolate?"]]},
+      {id:65, verb:"hassen", ipa:"ˈhasən", meaning:"to hate", examples:[["Ich hasse Lärm.","I hate noise."],["Sie hasst kaltes Wetter.","She hates cold weather."]]},
+      {id:66, verb:"fühlen", ipa:"ˈfyːlən", meaning:"to feel", examples:[["Ich fühle mich müde.","I feel tired."],["Er fühlt den Schmerz.","He feels the pain."]]},
+      {id:67, verb:"lachen", ipa:"ˈlaxən", meaning:"to laugh", examples:[["Wir lachen viel.","We laugh a lot."],["Sie lacht über den Witz.","She laughs at the joke."]]},
+      {id:68, verb:"weinen", ipa:"ˈvaɪ̯nən", meaning:"to cry", examples:[["Das Baby weint.","The baby is crying."],["Er weint vor Freude.","He cries with joy."]]},
+      {id:69, verb:"träumen", ipa:"ˈtʁɔʏ̯mən", meaning:"to dream", examples:[["Ich träume oft.","I dream often."],["Sie träumt von Urlaub.","She dreams of vacation."]]},
+      {id:70, verb:"schicken", ipa:"ˈʃɪkən", meaning:"to send", examples:[["Ich schicke dir den Link.","I’ll send you the link."],["Er schickt eine Nachricht.","He sends a message."]]},
+
+      // 71–80
+      {id:71, verb:"erhalten", ipa:"ɛʁˈhaltən", meaning:"to receive; obtain", examples:[["Ich erhalte eine E-Mail.","I receive an email."],["Er erhält den Preis heute.","He receives the prize today."]]},
+      {id:72, verb:"senden", ipa:"ˈzɛndən", meaning:"to send; broadcast", examples:[["Wir senden die Datei.","We send the file."],["Der Sender sendet Nachrichten.","The station broadcasts news."]]},
+      {id:73, verb:"bauen", ipa:"ˈbaʊ̯ən", meaning:"to build", examples:[["Wir bauen ein Haus.","We are building a house."],["Sie bauen eine Brücke.","They are building a bridge."]]},
+      {id:74, verb:"reparieren", ipa:"ʁepaˈʁiːʁən", meaning:"to repair; fix", examples:[["Ich repariere das Fahrrad.","I’m fixing the bike."],["Die Werkstatt repariert das Auto.","The shop repairs the car."]]},
+      {id:75, verb:"putzen", ipa:"ˈpʊt͡sən", meaning:"to clean", examples:[["Ich putze die Wohnung.","I clean the apartment."],["Er putzt das Bad.","He cleans the bathroom."]]},
+      {id:76, verb:"waschen", ipa:"ˈvaʃən", meaning:"to wash", examples:[["Ich wasche meine Hände.","I wash my hands."],["Sie wäscht die Kleidung.","She washes the clothes."]]},
+      {id:77, verb:"kochen", ipa:"ˈkɔxən", meaning:"to cook", examples:[["Ich koche Nudeln.","I’m cooking pasta."],["Meine Mutter kocht sehr gut.","My mother cooks very well."]]},
+      {id:78, verb:"backen", ipa:"ˈbakən", meaning:"to bake", examples:[["Sie backt einen Kuchen.","She is baking a cake."],["Ich backe Brot.","I bake bread."]]},
+      {id:79, verb:"schneiden", ipa:"ˈʃnaɪ̯dən", meaning:"to cut", examples:[["Ich schneide Gemüse.","I’m cutting vegetables."],["Der Friseur schneidet Haare.","The hairdresser cuts hair."]]},
+      {id:80, verb:"sollen", ipa:"ˈzɔlən", meaning:"should; ought to", examples:[["Ich soll lernen.","I should study."],["Du sollst pünktlich sein.","You should be on time."]]},
+
+      // 81–90
+      {id:81, verb:"dürfen", ipa:"ˈdʏʁfən", meaning:"may; be allowed to", examples:[["Du darfst hier parken.","You may park here."],["Darf ich reinkommen?","May I come in?"]]},
+      {id:82, verb:"wollen", ipa:"ˈvɔlən", meaning:"to want (to)", examples:[["Ich will Deutsch lernen.","I want to learn German."],["Willst du mitkommen?","Do you want to come along?"]]},
+      {id:83, verb:"ausgeben", ipa:"ˈaʊ̯sɡeːbən", meaning:"to spend (money)", examples:[["Ich gebe zu viel Geld aus.","I spend too much money."],["Wir geben 20 Euro aus.","We spend 20 euros."]]},
+      {id:84, verb:"mieten", ipa:"ˈmiːtən", meaning:"to rent (from)", examples:[["Ich miete eine Wohnung.","I rent an apartment."],["Wir mieten ein Auto.","We rent a car."]]},
+      {id:85, verb:"vermieten", ipa:"fɛɐ̯ˈmiːtən", meaning:"to rent out (to)", examples:[["Ich vermiete mein Zimmer.","I rent out my room."],["Die Firma vermietet Autos.","The company rents out cars."]]},
+      {id:86, verb:"bestellen", ipa:"bəˈʃtɛlən", meaning:"to order", examples:[["Ich bestelle eine Pizza.","I order a pizza."],["Wir bestellen online.","We order online."]]},
+      {id:87, verb:"liefern", ipa:"ˈliːfɐn", meaning:"to deliver", examples:[["Der Kurier liefert das Paket.","The courier delivers the parcel."],["Wir liefern morgen.","We deliver tomorrow."]]},
+      {id:88, verb:"feiern", ipa:"ˈfaɪ̯ɐn", meaning:"to celebrate", examples:[["Wir feiern heute Abend.","We’re celebrating tonight."],["Sie feiern Geburtstag.","They celebrate a birthday."]]},
+      {id:89, verb:"teilnehmen", ipa:"ˈtaɪ̯lˌneːmən", meaning:"to take part", examples:[["Ich nehme am Kurs teil.","I take part in the course."],["Viele nehmen an der Konferenz teil.","Many take part in the conference."]]},
+      {id:90, verb:"vorbereiten", ipa:"ˈfoːɐ̯bəˌʁaɪ̯tən", meaning:"to prepare", examples:[["Ich bereite das Essen vor.","I prepare the food."],["Sie bereitet sich auf die Prüfung vor.","She prepares for the exam."]]},
+
+      // 91–100
+      {id:91, verb:"vorstellen", ipa:"ˈfoːɐ̯ˌʃtɛlən", meaning:"to introduce; present", examples:[["Darf ich mich vorstellen?","May I introduce myself?"],["Ich stelle mein Projekt vor.","I present my project."]]},
+      {id:92, verb:"anmelden", ipa:"ˈanˌmɛldən", meaning:"to register; log in", examples:[["Ich melde mich im Portal an.","I log into the portal."],["Er meldet sich für den Kurs an.","He registers for the course."]]},
+      {id:93, verb:"abmelden", ipa:"ˈapˌmɛldən", meaning:"to log out; deregister", examples:[["Ich melde mich ab.","I log out."],["Er meldet das Auto ab.","He deregisters the car."]]},
+      {id:94, verb:"herunterladen", ipa:"heˈʁʊntɐˌlaːdən", meaning:"to download", examples:[["Ich lade die Datei herunter.","I download the file."],["Er lädt Bilder herunter.","He downloads images."]]},
+      {id:95, verb:"hochladen", ipa:"ˈhoːxˌlaːdən", meaning:"to upload", examples:[["Ich lade das Video hoch.","I upload the video."],["Sie lädt Fotos hoch.","She uploads photos."]]},
+      {id:96, verb:"drucken", ipa:"ˈdʁʊkən", meaning:"to print", examples:[["Ich drucke das Dokument.","I print the document."],["Der Drucker druckt langsam.","The printer prints slowly."]]},
+      {id:97, verb:"kopieren", ipa:"koˈpiːʁən", meaning:"to copy", examples:[["Ich kopiere den Text.","I copy the text."],["Er kopiert die Datei.","He copies the file."]]},
+      {id:98, verb:"teilen", ipa:"ˈtaɪ̯lən", meaning:"to share; divide", examples:[["Ich teile den Link.","I share the link."],["Wir teilen die Kosten.","We share the costs."]]},
+      {id:99, verb:"können", ipa:"ˈkœnən", meaning:"can; be able to", examples:[["Ich kann schwimmen.","I can swim."],["Wir können später sprechen.","We can talk later."]]},
+      {id:100, verb:"müssen", ipa:"ˈmʏsən", meaning:"must; have to", examples:[["Wir müssen gehen.","We have to go."],["Ich muss heute arbeiten.","I must work today."]]}
+    ];
+
+    // ===== Render =====
+    const list = document.getElementById("list");
+    const count = document.getElementById("count");
+
+    function render(items){
+      list.innerHTML = items.map(v=>{
+        const verbEasy = easyDePronounce(v.verb);
+        const examples = v.examples.map(([de,en])=>{
+          const easy = easyDePronounce(de);
+          // sentence row with right-side easy phonetic
+          return `
+            <div class="ex-row">
+              <div class="ex-left">
+                <b>Beispiel:</b> ${de}
+                <button class="say" onclick="speak('${de.replace(/'/g,"\\'")}')">🔊</button>
+                <span style="margin-left:6px;color:var(--muted)">${en}</span>
+              </div>
+              <div class="ex-right">👄 ${easy}</div>
+            </div>
+          `;
+        }).join("");
+        return `
+          <section class="verb">
+            <div class="verb-head">
+              <h3 class="verb-title">${v.id}. ${v.verb} <span class="meaning">— ${v.meaning}</span></h3>
+              <div class="rightline">
+                <button class="say" onclick="speak('${v.verb.replace(/'/g,"\\'")}')">🔊 /<span class="ipa">${v.ipa}</span>/</button>
+                <span class="easy">👄 ${verbEasy}</span>
+              </div>
+            </div>
+            <div class="examples">
+              ${examples}
+            </div>
+          </section>
+        `;
+      }).join("");
+
+      count.textContent = `${items.length} / ${verbs.length} shown`;
+    }
+
+    render(verbs);
+
+    // Search
+    document.getElementById("search").addEventListener("input", e=>{
+      const q = e.target.value.trim().toLowerCase();
+      if(!q) return render(verbs);
+      const filtered = verbs.filter(v =>
+        v.verb.toLowerCase().includes(q) ||
+        v.meaning.toLowerCase().includes(q) ||
+        v.examples.some(([de,en])=> de.toLowerCase().includes(q) || en.toLowerCase().includes(q))
+      );
+      render(filtered);
+    });
+  </script>
+</body>
+</html>
