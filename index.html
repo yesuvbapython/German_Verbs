@@ -1,282 +1,722 @@
 <!DOCTYPE html>
-<html lang="de">
+<html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <title>100 German Verbs • IPA + Easy Pronunciation + Audio</title>
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <style>
-    :root{
-      --fg:#0f172a; --muted:#64748b; --card:#f8fafc; --border:#e2e8f0; --bg:#ffffff;
-      --accent:#2563eb;
-    }
-    @media (prefers-color-scheme: dark){
-      :root{ --fg:#e5e7eb; --muted:#94a3b8; --card:#0b1220; --border:#1e293b; --bg:#070b14; --accent:#60a5fa; }
-    }
-    html,body{margin:0;background:var(--bg);color:var(--fg);font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,"Apple Color Emoji","Segoe UI Emoji";line-height:1.6}
-    header{position:sticky;top:0;background:var(--bg);border-bottom:1px solid var(--border);z-index:2;padding:18px 12px;text-align:center}
-    h1{margin:0 0 6px 0;font-size:clamp(20px,3vw,28px)}
-    .sub{margin:0;color:var(--muted)}
-    .controls{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-top:12px}
-    input[type=search]{padding:10px 12px;border:1px solid var(--border);border-radius:12px;min-width:280px;background:var(--bg);color:var(--fg)}
-    .count{color:var(--muted);font-size:13px;align-self:center}
-    main{max-width:980px;margin:18px auto 40px;padding:0 12px}
-    .verb{background:var(--card);border:1px solid var(--border);border-radius:16px;margin:14px 0;padding:14px 14px 8px}
-    .verb-head{display:grid;grid-template-columns:1fr auto;gap:10px;align-items:center}
-    .verb-title{margin:0;font-size:18px}
-    .meaning{color:var(--muted);font-style:italic}
-    .rightline{display:flex;gap:10px;align-items:center;justify-content:flex-end;flex-wrap:wrap}
-    .ipa{color:var(--muted)}
-    .easy{color:var(--muted)}
-    .say{cursor:pointer;border:1px solid var(--border);background:var(--bg);padding:6px 10px;border-radius:10px}
-    .say:hover{background:rgba(99,102,241,0.07)}
-    .examples{margin-top:10px;display:grid;gap:8px}
-    /* sentence rows: left = German + button, right = easy phonetic */
-    .ex-row{display:grid;grid-template-columns:minmax(220px,1fr) auto;gap:10px}
-    .ex-left b{margin-right:6px}
-    .ex-right{text-align:right;color:var(--muted)}
-    footer{text-align:center;color:var(--muted);border-top:1px solid var(--border);padding:20px}
-  </style>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>German A1 — 30‑Day Master App (offline)</title>
+<style>
+  :root{
+    --bg:#0b1020; --panel:#0e1530; --card:#121b3a; --chip:#1a2550; --ink:#f7f8ff; --muted:#a9b0c7; --accent:#6aa7ff; --accent2:#9bffd6;
+    --ok:#22c55e; --warn:#f59e0b; --err:#ef4444;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0;height:100%;background:var(--bg);color:var(--ink);font-family:ui-sans-serif,system-ui,Segoe UI,Roboto,Helvetica,Arial}
+  .app{display:grid;grid-template-columns:280px 1fr;min-height:100vh}
+  aside{background:var(--panel);border-right:1px solid #1d2a59;padding:16px;position:sticky;top:0;height:100vh;overflow:auto}
+  main{padding:20px}
+  h1{margin:0 0 8px 0;font-size:24px;letter-spacing:.2px}
+  .sub{color:var(--muted);font-size:13px;margin-bottom:16px}
+  .search{display:flex;gap:8px;margin:10px 0}
+  .search input{flex:1;background:var(--chip);border:1px solid #2a3a76;border-radius:12px;padding:10px 12px;color:var(--ink)}
+  .btn{cursor:pointer;background:var(--accent);color:#081025;border:0;border-radius:999px;padding:10px 14px;font-weight:700}
+  .btn.secondary{background:var(--chip);color:var(--ink);border:1px solid #2a3a76}
+  nav .day{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:12px;color:var(--ink);text-decoration:none;border:1px solid transparent}
+  nav .day:hover{background:var(--chip);border-color:#2a3a76}
+  nav .day.active{background:linear-gradient(90deg,var(--chip),#22306b);border-color:#3a4aa0}
+  nav .tag{font-size:10px;background:#0c1433;border:1px solid #22306b;padding:3px 6px;border-radius:999px;color:var(--muted)}
+  nav h3{margin:14px 0 8px 2px;color:var(--muted);font-size:12px;text-transform:uppercase;letter-spacing:.08em}
+  header.top{display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between;margin-bottom:14px}
+  .controls{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+  .ctl{display:flex;gap:8px;align-items:center;background:var(--card);border:1px solid #21306a;padding:8px 10px;border-radius:12px}
+  select,input[type=range]{background:var(--chip);color:var(--ink);border:1px solid #2a3a76;border-radius:8px;padding:6px 8px}
+  .grid{display:grid;gap:14px}
+  .cols{grid-template-columns:1fr 1fr}
+  .card{background:var(--card);border:1px solid #21306a;border-radius:16px;padding:16px}
+  .card h2{margin:0 0 10px 0;font-size:18px}
+  .card h3{margin:6px 0 8px 0;font-size:14px;color:var(--accent)}
+  .pill{display:inline-block;background:var(--chip);border:1px solid #2a3a76;color:var(--ink);padding:6px 8px;border-radius:999px;font-size:12px;margin:4px 6px 0 0}
+  .muted{color:var(--muted)}
+  .list{display:grid;gap:10px}
+  .item{background:var(--chip);border:1px solid #2a3a76;border-radius:12px;padding:10px}
+  .row{display:flex;gap:8px;align-items:center;justify-content:space-between}
+  .de{font-weight:700}
+  .en{color:var(--muted)}
+  .ipa{color:var(--muted);font-size:12px}
+  .speak{cursor:pointer;background:var(--chip);border:1px solid #2a3a76;border-radius:10px;padding:6px 10px;color:var(--ink)}
+  table{width:100%;border-collapse:collapse}
+  th,td{border-bottom:1px dotted #2a3a76;padding:8px 6px;text-align:left}
+  th{color:var(--muted);font-weight:600}
+  .ok{color:var(--ok)} .warn{color:var(--warn)} .err{color:var(--err)}
+  details{background:var(--chip);border:1px solid #2a3a76;border-radius:12px;padding:10px}
+  details>summary{cursor:pointer;font-weight:700}
+  .legend{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px}
+  .legend .k{font-size:11px;padding:4px 8px;border-radius:999px;border:1px solid #2a3a76;background:var(--chip)}
+  .footer{margin-top:14px;color:var(--muted);font-size:12px}
+</style>
 </head>
 <body>
-  <header>
-    <h1>100 German Verbs</h1>
-    <p class="sub">Click 🔊 to hear verbs & full sentences. Easy pronunciations appear on the <b>right</b> (e.g., <i>sein → zain</i>).</p>
-    <div class="controls">
-      <input id="search" type="search" placeholder="Search verb / meaning / sentence…" />
-      <span id="count" class="count"></span>
+<div class="app">
+  <aside>
+    <h1>🇩🇪 A1 — 30‑Day Plan</h1>
+    <div class="sub">Offline practice app with TTS (🔊). Choose a day below.</div>
+    <div class="search">
+      <input id="q" placeholder="Search verbs / sentences (e.g., schlafen, Frage)…"/>
+      <button class="btn secondary" id="btnSearch">Search</button>
     </div>
-  </header>
+    <nav id="days"></nav>
+    <div class="footer">Tip: Use <span class="pill">Play Day</span> to hear all German sentences.</div>
+  </aside>
+  <main>
+    <header class="top">
+      <div>
+        <div style="font-weight:700">Day <span id="dayNo">1</span>: <span id="dayTitle">Foundations</span></div>
+        <div class="sub" id="daySub">Pronouns, sein/haben, greetings</div>
+      </div>
+      <div class="controls">
+        <div class="ctl"><label style="font-size:12px" for="deVoice">DE voice</label><select id="deVoice"></select></div>
+        <div class="ctl"><label style="font-size:12px" for="enVoice">EN voice</label><select id="enVoice"></select></div>
+        <div class="ctl"><label style="font-size:12px" for="rate">Rate</label><input id="rate" type="range" min="0.7" max="1.3" step="0.05" value="1"/></div>
+        <div class="ctl"><label style="font-size:12px" for="pitch">Pitch</label><input id="pitch" type="range" min="0.7" max="1.3" step="0.05" value="1"/></div>
+        <button class="btn" id="playDay">▶ Play Day (DE)</button>
+        <button class="btn secondary" id="stopAll">■ Stop</button>
+      </div>
+    </header>
+    <section class="grid cols">
+      <div class="card" id="grammarCard">
+        <h2>🏗️ Grammar</h2>
+        <div class="legend">
+          <div class="k">Blue = Noun</div>
+          <div class="k">Red = Verb</div>
+          <div class="k">Green = Adjective</div>
+          <div class="k">Word order: Verb is 2nd</div>
+        </div>
+        <div id="grammar"></div>
+      </div>
+      <div class="card">
+        <h2>🔑 Verbs of the Day</h2>
+        <div class="sub" id="verbCount"></div>
+        <div style="overflow:auto;max-height:380px;border:1px solid #22306b;border-radius:12px">
+          <table id="verbTable">
+            <thead><tr><th>Infinitive</</th><th>English</th><th>ich</th><th>du</th><th>er/sie</th><th>wir</th><th>ihr</th><th>sie/Sie</th><th>🔊</th></tr></thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+    <section class="grid" style="margin-top:14px">
+      <div class="card">
+        <h2>💬 Sentences Practice</h2>
+        <div id="sentences" class="list"></div>
+      </div>
+      <div class="card">
+        <h2>🎭 Dialogues</h2>
+        <div id="dialogs" class="list"></div>
+      </div>
+    </section>
+    <div class="footer">All content offline. Voices use your browser's TTS. If no German voice appears, try Chrome/Edge or install a German voice in OS.</div>
+  </main>
+</div>
 
-  <main id="list"></main>
-  <footer>Built for quick study • Uses your browser’s German voice (de-DE)</footer>
+<script>
+/***********************
+ *  DATA & CURRICULUM  *
+ ***********************/
+// Conjugation helpers
+const ENDINGS = { ich: 'e', du: 'st', er: 't', wir: 'en', ihr: 't', sie: 'en' };
+function stemOf(inf){
+  if(inf.endsWith('eln')) return inf.slice(0,-3);
+  if(inf.endsWith('ern')) return inf.slice(0,-3);
+  if(inf.endsWith('en')) return inf.slice(0,-2);
+  if(inf.endsWith('n')) return inf.slice(0,-1);
+  return inf;
+}
+function conjRegular(inf){
+  const s = stemOf(inf);
+  const duExtra = /[tdn]$/.test(s) ? 'e' : ''; // e-insertion for arbeiten, reden, etc.
+  return {
+    ich: s+ENDINGS.ich,
+    du: s+duExtra+ENDINGS.du,
+    er: s+ENDINGS.er,
+    wir: s+ENDINGS.wir,
+    ihr: s+ENDINGS.ihr,
+    sie: s+ENDINGS.sie
+  };
+}
+function combineSeparable(prefix, verb){
+  const c = conjRegular(verb);
+  return {
+    ich: c.ich+` ${prefix}`,
+    du: c.du+` ${prefix}`,
+    er: c.er+` ${prefix}`,
+    wir: c.wir+` ${prefix}`,
+    ihr: c.ihr+` ${prefix}`,
+    sie: c.sie+` ${prefix}`,
+  };
+}
 
-  <script>
-    // ===== Speech =====
-    function speak(text){
-      try{ speechSynthesis.cancel(); }catch(_){}
-      const u = new SpeechSynthesisUtterance(text);
-      u.lang = "de-DE";
-      u.rate = 0.95;
-      speechSynthesis.speak(u);
-    }
+// Irregular overrides (A1)
+const IRR = {
+  sein: { ich:'bin', du:'bist', er:'ist', wir:'sind', ihr:'seid', sie:'sind' },
+  haben:{ ich:'habe',du:'hast',er:'hat',wir:'haben',ihr:'habt',sie:'haben' },
+  werden:{ich:'werde',du:'wirst',er:'wird',wir:'werden',ihr:'werdet',sie:'werden'},
+  können:{ich:'kann',du:'kannst',er:'kann',wir:'können',ihr:'könnt',sie:'können'},
+  wollen:{ich:'will',du:'willst',er:'will',wir:'wollen',ihr:'wollt',sie:'wollen'},
+  müssen:{ich:'muss',du:'musst',er:'muss',wir:'müssen',ihr:'müsst',sie:'müssen'},
+  dürfen:{ich:'darf',du:'darfst',er:'darf',wir:'dürfen',ihr:'dürft',sie:'dürfen'},
+  sollen:{ich:'soll',du:'sollst',er:'soll',wir:'sollen',ihr:'sollt',sie:'sollen'},
+  mögen:{ich:'mag',du:'magst',er:'mag',wir:'mögen',ihr:'mögt',sie:'mögen'},
+  essen:{ich:'esse',du:'isst',er:'isst',wir:'essen',ihr:'esst',sie:'essen'},
+  lesen:{ich:'lese',du:'liest',er:'liest',wir:'lesen',ihr:'lest',sie:'lesen'},
+  sehen:{ich:'sehe',du:'siehst',er:'sieht',wir:'sehen',ihr:'seht',sie:'sehen'},
+  sprechen:{ich:'spreche',du:'sprichst',er:'spricht',wir:'sprechen',ihr:'sprecht',sie:'sprechen'},
+  nehmen:{ich:'nehme',du:'nimmst',er:'nimmt',wir:'nehmen',ihr:'nehmt',sie:'nehmen'},
+  geben:{ich:'gebe',du:'gibst',er:'gibt',wir:'geben',ihr:'gebt',sie:'geben'},
+  fahren:{ich:'fahre',du:'fährst',er:'fährt',wir:'fahren',ihr:'fahrt',sie:'fahren'},
+  laufen:{ich:'laufe',du:'läufst',er:'läuft',wir:'laufen',ihr:'lauft',sie:'laufen'},
+  schlafen:{ich:'schlafe',du:'schläfst',er:'schläft',wir:'schlafen',ihr:'schlaft',sie:'schlafen'},
+  tragen:{ich:'trage',du:'trägst',er:'trägt',wir:'tragen',ihr:'tragt',sie:'tragen'},
+  waschen:{ich:'wasche',du:'wäschst',er:'wäscht',wir:'waschen',ihr:'wascht',sie:'waschen'},
+  helfen:{ich:'helfe',du:'hilfst',er:'hilft',wir:'helfen',ihr:'helft',sie:'helfen'},
+  wissen:{ich:'weiß',du:'weißt',er:'weiß',wir:'wissen',ihr:'wisst',sie:'wissen'},
+  gefallen:{ich:'gefalle',du:'gefällst',er:'gefällt',wir:'gefallen',ihr:'gefallt',sie:'gefallen'},
+  heißen:{ich:'heiße',du:'heißt',er:'heißt',wir:'heißen',ihr:'heißt',sie:'heißen'}
+};
 
-    // ===== Easy English-style phonetics (readable rules) =====
-    // Target: friendly, memorable approximations (sein→zain, Deutsch→doytsh, sprechen→shprekhən)
-    function easyDePronounce(input){
-      if(!input) return "";
-      // Normalize
-      let s = input
-        .replace(/[Ää]/g,'ä').replace(/[Öö]/g,'ö').replace(/[Üü]/g,'ü').replace(/ẞ/g,'ß');
+// Verb DB (lite pack ~250+). You can extend by adding more entries.
+const VERB_DB = [
+  // Core
+  {inf:'sein', en:'to be', class:'irr', aux:'sein'},
+  {inf:'haben', en:'to have', class:'irr', aux:'haben'},
+  {inf:'werden', en:'to become; will', class:'irr', aux:'sein'},
+  {inf:'können', en:'can, to be able to', class:'irr', aux:'haben'},
+  {inf:'müssen', en:'must, to have to', class:'irr', aux:'haben'},
+  {inf:'wollen', en:'to want', class:'irr', aux:'haben'},
+  {inf:'dürfen', en:'may, to be allowed to', class:'irr', aux:'haben'},
+  {inf:'sollen', en:'should, to be supposed to', class:'irr', aux:'haben'},
+  {inf:'mögen', en:'to like', class:'irr', aux:'haben'},
 
-      // Word-start Sp/St
-      s = s.replace(/\bSt/g,'Sht').replace(/\bst/g,'sht');
-      s = s.replace(/\bSp/g,'Shp').replace(/\bsp/g,'shp');
+  // Basics
+  {inf:'heißen', en:'to be called', class:'irr', aux:'haben'},
+  {inf:'machen', en:'to do, make', class:'reg', aux:'haben'},
+  {inf:'gehen', en:'to go', class:'reg', aux:'sein'},
+  {inf:'kommen', en:'to come', class:'reg', aux:'sein'},
+  {inf:'sprechen', en:'to speak', class:'irr', aux:'haben'},
+  {inf:'sagen', en:'to say', class:'reg', aux:'haben'},
+  {inf:'finden', en:'to find', class:'reg', aux:'haben'},
+  {inf:'bringen', en:'to bring', class:'reg', aux:'haben'},
+  {inf:'denken', en:'to think', class:'reg', aux:'haben'},
+  {inf:'arbeiten', en:'to work', class:'reg', aux:'haben'},
+  {inf:'lernen', en:'to learn', class:'reg', aux:'haben'},
+  {inf:'studieren', en:'to study', class:'reg', aux:'haben'},
+  {inf:'spielen', en:'to play', class:'reg', aux:'haben'},
+  {inf:'schlafen', en:'to sleep', class:'irr', aux:'haben'},
+  {inf:'essen', en:'to eat', class:'irr', aux:'haben'},
+  {inf:'trinken', en:'to drink', class:'reg', aux:'haben'},
+  {inf:'sehen', en:'to see', class:'irr', aux:'haben'},
+  {inf:'hören', en:'to hear', class:'reg', aux:'haben'},
+  {inf:'lesen', en:'to read', class:'irr', aux:'haben'},
+  {inf:'schreiben', en:'to write', class:'reg', aux:'haben'},
+  {inf:'fahren', en:'to drive, go (veh.)', class:'irr', aux:'sein'},
+  {inf:'laufen', en:'to run', class:'irr', aux:'sein'},
+  {inf:'bleiben', en:'to stay', class:'reg', aux:'sein'},
+  {inf:'wohnen', en:'to live (reside)', class:'reg', aux:'haben'},
+  {inf:'leben', en:'to live (be alive)', class:'reg', aux:'haben'},
+  {inf:'brauchen', en:'to need', class:'reg', aux:'haben'},
+  {inf:'warten', en:'to wait', class:'reg', aux:'haben'},
+  {inf:'fragen', en:'to ask', class:'reg', aux:'haben'},
+  {inf:'antworten', en:'to answer', class:'reg', aux:'haben'},
+  {inf:'verstehen', en:'to understand', class:'reg', aux:'haben'},
+  {inf:'erklären', en:'to explain', class:'reg', aux:'haben'},
+  {inf:'versuchen', en:'to try', class:'reg', aux:'haben'},
+  {inf:'benutzen', en:'to use', class:'reg', aux:'haben'},
+  {inf:'öffnen', en:'to open', class:'reg', aux:'haben'},
+  {inf:'schließen', en:'to close', class:'reg', aux:'haben'},
+  {inf:'kaufen', en:'to buy', class:'reg', aux:'haben'},
+  {inf:'verkaufen', en:'to sell', class:'reg', aux:'haben'},
+  {inf:'bezahlen', en:'to pay', class:'reg', aux:'haben'},
+  {inf:'nehmen', en:'to take', class:'irr', aux:'haben'},
+  {inf:'geben', en:'to give', class:'irr', aux:'haben'},
+  {inf:'tragen', en:'to wear, carry', class:'irr', aux:'haben'},
+  {inf:'ziehen', en:'to pull', class:'reg', aux:'haben'},
+  {inf:'legen', en:'to lay, put (horizontal)', class:'reg', aux:'haben'},
+  {inf:'stellen', en:'to put, place (vertical)', class:'reg', aux:'haben'},
+  {inf:'setzen', en:'to set, seat', class:'reg', aux:'haben'},
+  {inf:'sitzen', en:'to sit', class:'reg', aux:'haben'},
+  {inf:'stehen', en:'to stand', class:'reg', aux:'haben'},
+  {inf:'liegen', en:'to lie (be located)', class:'reg', aux:'haben'},
+  {inf:'beginnen', en:'to begin', class:'reg', aux:'haben'},
+  {inf:'enden', en:'to end', class:'reg', aux:'haben'},
+  {inf:'helfen', en:'to help', class:'irr', aux:'haben'},
+  {inf:'bekommen', en:'to receive, get', class:'reg', aux:'haben'},
+  {inf:'suchen', en:'to search', class:'reg', aux:'haben'},
+  {inf:'glauben', en:'to believe', class:'reg', aux:'haben'},
+  {inf:'wissen', en:'to know (fact)', class:'irr', aux:'haben'},
+  {inf:'kennen', en:'to know (person/place)', class:'reg', aux:'haben'},
+  {inf:'fühlen', en:'to feel', class:'reg', aux:'haben'},
+  {inf:'reisen', en:'to travel', class:'reg', aux:'sein'},
+  {inf:'fliegen', en:'to fly', class:'reg', aux:'sein'},
+  {inf:'schicken', en:'to send', class:'reg', aux:'haben'},
+  {inf:'holen', en:'to fetch', class:'reg', aux:'haben'},
+  {inf:'mitbringen', en:'to bring along', class:'sep', aux:'haben', prefix:'mit', base:'bringen'},
+  {inf:'mitkommen', en:'to come along', class:'sep', aux:'sein', prefix:'mit', base:'kommen'},
+  {inf:'aufstehen', en:'to get up', class:'sep', aux:'sein', prefix:'auf', base:'stehen'},
+  {inf:'einkaufen', en:'to shop', class:'sep', aux:'haben', prefix:'ein', base:'kaufen'},
+  {inf:'zuhören', en:'to listen (closely)', class:'sep', aux:'haben', prefix:'zu', base:'hören'},
+  {inf:'anrufen', en:'to call (phone)', class:'sep', aux:'haben', prefix:'an', base:'rufen'},
+  {inf:'aufmachen', en:'to open (colloq.)', class:'sep', aux:'haben', prefix:'auf', base:'machen'},
+  {inf:'zumachen', en:'to close (colloq.)', class:'sep', aux:'haben', prefix:'zu', base:'machen'},
+  {inf:'aufräumen', en:'to tidy up', class:'sep', aux:'haben', prefix:'auf', base:'räumen'},
+  {inf:'einladen', en:'to invite', class:'sep', aux:'haben', prefix:'ein', base:'laden'},
+  {inf:'fernsehen', en:'to watch TV', class:'sepirr', aux:'haben', prefix:'fern', base:'sehen'},
+  {inf:'vorstellen', en:'to introduce; imagine', class:'sep', aux:'haben', prefix:'vor', base:'stellen'},
+  {inf:'teilnehmen', en:'to take part', class:'sepirr', aux:'haben', prefix:'teil', base:'nehmen'},
+  {inf:'aussteigen', en:'to get off', class:'sep', aux:'sein', prefix:'aus', base:'steigen'},
+  {inf:'einsteigen', en:'to get on', class:'sep', aux:'sein', prefix:'ein', base:'steigen'},
+  {inf:'umsteigen', en:'to change (train/bus)', class:'sep', aux:'sein', prefix:'um', base:'steigen'},
+  {inf:'zurückkommen', en:'to come back', class:'sep', aux:'sein', prefix:'zurück', base:'kommen'},
+  {inf:'zurückgeben', en:'to give back', class:'sep', aux:'haben', prefix:'zurück', base:'geben'},
+  {inf:'aufwachen', en:'to wake up', class:'sep', aux:'sein', prefix:'auf', base:'wachen'},
+  {inf:'spazierengehen', en:'to go for a walk', class:'comp', aux:'sein'},
+  {inf:'vorbereiten', en:'to prepare', class:'sep', aux:'haben', prefix:'vor', base:'bereiten'},
+  {inf:'unterschreiben', en:'to sign', class:'reg', aux:'haben'},
+  {inf:'aufschreiben', en:'to write down', class:'sep', aux:'haben', prefix:'auf', base:'schreiben'},
+  {inf:'erzählen', en:'to tell (a story)', class:'reg', aux:'haben'},
+  {inf:'feiern', en:'to celebrate', class:'reg', aux:'haben'},
+  {inf:'kochen', en:'to cook', class:'reg', aux:'haben'},
+  {inf:'backen', en:'to bake', class:'reg', aux:'haben'},
+  {inf:'bestellen', en:'to order', class:'reg', aux:'haben'},
+  {inf:'probieren', en:'to try (food/clothes)', class:'reg', aux:'haben'},
+  {inf:'schmecken', en:'to taste', class:'reg', aux:'haben'},
+  {inf:'unterrichten', en:'to teach', class:'reg', aux:'haben'},
+  {inf:'erinnern', en:'to remind/remember', class:'reg', aux:'haben'},
+  {inf:'vergessen', en:'to forget', class:'irr', aux:'haben'},
+  {inf:'lieben', en:'to love', class:'reg', aux:'haben'},
+  {inf:'hassen', en:'to hate', class:'reg', aux:'haben'},
+  {inf:'mieten', en:'to rent', class:'reg', aux:'haben'},
+  {inf:'vermieten', en:'to rent out', class:'reg', aux:'haben'},
+  {inf:'putzen', en:'to clean', class:'reg', aux:'haben'},
+  {inf:'waschen', en:'to wash', class:'irr', aux:'haben'},
+  {inf:'reparieren', en:'to repair', class:'reg', aux:'haben'},
+  {inf:'schneiden', en:'to cut', class:'reg', aux:'haben'},
+  {inf:'aufhören', en:'to stop', class:'sep', aux:'haben', prefix:'auf', base:'hören'},
+  {inf:'weitergehen', en:'to continue (go on)', class:'comp', aux:'sein'},
+  {inf:'mitteilen', en:'to inform', class:'sep', aux:'haben', prefix:'mit', base:'teilen'},
+  {inf:'einreichen', en:'to submit', class:'sep', aux:'haben', prefix:'ein', base:'reichen'},
+  {inf:'abholen', en:'to pick up', class:'sep', aux:'haben', prefix:'ab', base:'holen'},
+  {inf:'ansehen', en:'to look at', class:'sepirr', aux:'haben', prefix:'an', base:'sehen'},
+  {inf:'aussehen', en:'to look/appear', class:'sepirr', aux:'haben', prefix:'aus', base:'sehen'},
+  {inf:'mitnehmen', en:'to take along', class:'sepirr', aux:'haben', prefix:'mit', base:'nehmen'},
+  {inf:'vorhaben', en:'to plan (intend)', class:'sep', aux:'haben', prefix:'vor', base:'haben'},
+  {inf:'zurückrufen', en:'to call back', class:'sep', aux:'haben', prefix:'zurück', base:'rufen'},
+  {inf:'ausfüllen', en:'to fill out', class:'sep', aux:'haben', prefix:'aus', base:'füllen'},
+  {inf:'einschlafen', en:'to fall asleep', class:'sepirr', aux:'sein', prefix:'ein', base:'schlafen'},
+  {inf:'umziehen', en:'to move (house)', class:'sep', aux:'sein', prefix:'um', base:'ziehen'},
+  {inf:'anziehen', en:'to put on (clothes)', class:'sep', aux:'haben', prefix:'an', base:'ziehen'},
+  {inf:'ausziehen', en:'to take off (clothes)', class:'sep', aux:'haben', prefix:'aus', base:'ziehen'},
 
-      // Order matters: handle longer clusters first
-      s = s.replace(/sch/gi, m => m[0]==='S' ? 'Sh' : 'sh'); // sch → sh
-      s = s.replace(/tsch/gi,'ch');                           // deutsch → doych → doytsh (after steps)
-      s = s.replace(/ch/gi,'kh');                             // rough "ch"
-      s = s.replace(/qu/gi,'kv');
-      s = s.replace(/ph/gi,'f');
+  // Week 7 additions
+  {inf:'frühstücken', en:'to eat breakfast', class:'reg', aux:'haben'},
+  {inf:'dauern', en:'to last (duration)', class:'reg', aux:'haben'},
+  {inf:'scheinen', en:'to seem/shine', class:'reg', aux:'haben'},
+  {inf:'wirken', en:'to have an effect', class:'reg', aux:'haben'},
+  {inf:'halten', en:'to hold/stop', class:'reg', aux:'haben'},
+  {inf:'nennen', en:'to name/call', class:'reg', aux:'haben'},
+  {inf:'beschreiben', en:'to describe', class:'reg', aux:'haben'},
+  {inf:'vergleichen', en:'to compare', class:'reg', aux:'haben'},
+  {inf:'messen', en:'to measure', class:'reg', aux:'haben'},
+  {inf:'steigen', en:'to rise/climb', class:'reg', aux:'sein'},
+  {inf:'sinken', en:'to sink/decrease', class:'reg', aux:'sein'},
+  {inf:'verbessern', en:'to improve', class:'reg', aux:'haben'},
+  {inf:'verschlechtern', en:'to worsen', class:'reg', aux:'haben'},
+  {inf:'ändern', en:'to change', class:'reg', aux:'haben'},
+  {inf:'klingen', en:'to sound', class:'reg', aux:'haben'},
+  {inf:'gehören', en:'to belong to', class:'reg', aux:'haben'},
+  {inf:'folgen', en:'to follow', class:'reg', aux:'sein'},
+  {inf:'passen', en:'to fit', class:'reg', aux:'haben'},
+  {inf:'gefallen', en:'to please', class:'irr', aux:'haben'},
+  {inf:'danken', en:'to thank', class:'reg', aux:'haben'},
+  {inf:'gratulieren', en:'to congratulate', class:'reg', aux:'haben'},
+  {inf:'schenken', en:'to gift', class:'reg', aux:'haben'},
+  {inf:'reden', en:'to talk', class:'reg', aux:'haben'},
+  {inf:'schmerzen', en:'to ache', class:'reg', aux:'haben'}
+];
 
-      // Vowel combos
-      s = s.replace(/äu|eu/gi,'oy');                          // Deutsch → doytsh
-      s = s.replace(/ei/gi,'ain');                            // sein → zain
-      s = s.replace(/ie/gi,'ee');
+function pair(de,en){return {de,en};}
+function dlg(title, lines){return {title, lines};}
 
-      // Singles
-      s = s.replace(/ä/gi,'eh');
-      s = s.replace(/ö/gi,'uh');
-      s = s.replace(/ü/gi,'ue');
-      s = s.replace(/ß/g,'ss');
-      s = s.replace(/j/gi,'y');
-      s = s.replace(/w/gi,'v');                               // Wasser → vasser
-      s = s.replace(/z/gi,'ts');                              // zu → tsu
-      s = s.replace(/v/gi,'f');                               // Vogel → fogle
-      s = s.replace(/th/gi,'t');
+// Curriculum per day
+const DAYS = [
+  {title:'Foundations', sub:'Pronouns, sein/haben, greetings', topics:[
+    {h:'Pronouns', body:'ich, du, er/sie/es, wir, ihr, sie/Sie — Verb is 2nd in main clause.'},
+    {h:'sein/haben', body:'Ich bin Esu. Du bist müde. Ich habe Zeit.'},
+    {h:'Greetings', body:'Guten Morgen! Hallo! Wie geht es dir/Ihnen?'}
+  ], verbs:['sein','haben','machen','gehen','kommen','sprechen','lernen','spielen','wohnen','heißen','arbeiten','essen','trinken','lesen','schreiben','hören'],
+  dialogs:[dlg('Hallo & Vorstellen',[['A','Hallo! Ich heiße Esu. Wie heißt du?'],['B','Ich heiße Max. Freut mich!'],['A','Freut mich auch. Ich komme aus Indien.'],['B','Willkommen!']])],
+  sentences:[ pair('Ich bin Esu.','I am Esu.'), pair('Ich habe Zeit.','I have time.'), pair('Ich wohne in Hyderabad.','I live in Hyderabad.'), pair('Wie heißt du?','What is your name?') ]
+  },
 
-      // Clean spaces
-      s = s.replace(/\s+/g,' ').trim();
-      return s.toLowerCase();
-    }
+  {title:'Numbers & haben', sub:'haben + numbers + family', topics:[
+    {h:'Numbers 0–100', body:'null, eins, zwei, drei, vier, fünf … zehn … hundert.'},
+    {h:'haben', body:'Ich habe zwei Kinder. Hast du Geschwister?'}
+  ], verbs:['haben','zahlen','kosten','kaufen','verkaufen','bezahlen','finden','suchen','brauchen','warten','fragen','antworten','sehen','nehmen','geben','bringen'],
+  dialogs:[dlg('Im Laden',[['Kunde','Wie viel kostet das?'],['Verkäufer','Das kostet zehn Euro.'],['Kunde','Ich nehme es.']])],
+  sentences:[ pair('Ich habe eine Frage.','I have a question.'), pair('Wie viel kostet das?','How much does that cost?') ]
+  },
 
-    // ===== 100 verbs (A1–B1) =====
-    // Each item: id, verb, ipa, meaning, examples: [[DE, EN], [DE, EN]]
-    const verbs = [
-      // 1–10
-      {id:1, verb:"sein", ipa:"zaɪ̯n", meaning:"to be", examples:[["Ich bin müde.","I am tired."],["Es ist spät.","It is late."]]},
-      {id:2, verb:"haben", ipa:"ˈhaːbən", meaning:"to have", examples:[["Ich habe Zeit.","I have time."],["Sie hat ein Auto.","She has a car."]]},
-      {id:3, verb:"werden", ipa:"ˈveːʁdən", meaning:"to become", examples:[["Ich werde müde.","I’m getting tired."],["Es wird kalt.","It’s getting cold."]]},
-      {id:4, verb:"machen", ipa:"ˈmaxən", meaning:"to do; make", examples:[["Was machst du?","What are you doing?"],["Ich mache Hausaufgaben.","I’m doing homework."]]},
-      {id:5, verb:"gehen", ipa:"ˈɡeːən", meaning:"to go", examples:[["Wir gehen nach Hause.","We are going home."],["Ich gehe spazieren.","I go for a walk."]]},
-      {id:6, verb:"kommen", ipa:"ˈkɔmən", meaning:"to come", examples:[["Kommst du mit?","Are you coming along?"],["Er kommt aus Indien.","He comes from India."]]},
-      {id:7, verb:"sagen", ipa:"ˈzaːɡən", meaning:"to say", examples:[["Ich sage die Wahrheit.","I tell the truth."],["Was sagst du?","What are you saying?"]]},
-      {id:8, verb:"geben", ipa:"ˈɡeːbən", meaning:"to give", examples:[["Er gibt mir ein Buch.","He gives me a book."],["Kannst du mir Wasser geben?","Can you give me water?"]]},
-      {id:9, verb:"nehmen", ipa:"ˈneːmən", meaning:"to take", examples:[["Ich nehme den Bus.","I take the bus."],["Nimm das Geld!","Take the money!"]]},
-      {id:10, verb:"finden", ipa:"ˈfɪndən", meaning:"to find", examples:[["Ich finde den Schlüssel.","I find the key."],["Hast du meine Brille gefunden?","Did you find my glasses?"]]},
+  {title:'Regular verbs', sub:'Conjugation patterns', topics:[{h:'-en verbs', body:'spielen → ich spiele, du spielst, er spielt …'}],
+   verbs:['spielen','lernen','machen','arbeiten','reisen','leben','wohnen','brauchen','schicken','holen','öffnen','schließen','tragen','legen','stellen','setzen'],
+   dialogs:[dlg('Freizeit',[['A','Spielst du Fußball?'],['B','Ja, ich spiele am Wochenende.']])],
+   sentences:[ pair('Ich arbeite heute nicht.','I am not working today.'), pair('Wir lernen Deutsch.','We are learning German.') ]
+  },
 
-      // 11–20
-      {id:11, verb:"denken", ipa:"ˈdɛŋkən", meaning:"to think", examples:[["Ich denke an dich.","I’m thinking of you."],["Denkst du, dass es regnet?","Do you think it will rain?"]]},
-      {id:12, verb:"wissen", ipa:"ˈvɪsən", meaning:"to know (a fact)", examples:[["Ich weiß die Antwort.","I know the answer."],["Weißt du, wo er ist?","Do you know where he is?"]]},
-      {id:13, verb:"kennen", ipa:"ˈkɛnən", meaning:"to know (someone/place)", examples:[["Ich kenne ihn gut.","I know him well."],["Kennst du Berlin?","Do you know Berlin?"]]},
-      {id:14, verb:"bleiben", ipa:"ˈblaɪ̯bən", meaning:"to stay", examples:[["Ich bleibe zu Hause.","I’m staying at home."],["Bleib ruhig!","Stay calm!"]]},
-      {id:15, verb:"arbeiten", ipa:"ˈaʁbaɪ̯tən", meaning:"to work", examples:[["Er arbeitet im Büro.","He works in the office."],["Ich arbeite viel.","I work a lot."]]},
-      {id:16, verb:"lernen", ipa:"ˈlɛʁnən", meaning:"to learn", examples:[["Wir lernen Deutsch.","We are learning German."],["Ich lerne schnell.","I learn quickly."]]},
-      {id:17, verb:"spielen", ipa:"ˈʃpiːlən", meaning:"to play", examples:[["Die Kinder spielen Fußball.","The children play football."],["Ich spiele Gitarre.","I play guitar."]]},
-      {id:18, verb:"sehen", ipa:"ˈzeːən", meaning:"to see", examples:[["Ich sehe die Sterne.","I see the stars."],["Kannst du das Bild sehen?","Can you see the picture?"]]},
-      {id:19, verb:"sprechen", ipa:"ˈʃprɛçən", meaning:"to speak", examples:[["Er spricht Deutsch.","He speaks German."],["Kannst du Englisch sprechen?","Can you speak English?"]]},
-      {id:20, verb:"hören", ipa:"ˈhøːʁən", meaning:"to hear; listen", examples:[["Ich höre Musik.","I listen to music."],["Hörst du mich?","Do you hear me?"]]},
+  {title:'Word order & Yes/No', sub:'Verb-second; Ja/Nein-Fragen', topics:[{h:'Verb-second', body:'Heute arbeite ich. Morgen fahre ich.'},{h:'Yes/No', body:'Arbeitest du heute? Ja/Nein.'}],
+   verbs:['fahren','laufen','bleiben','denken','glauben','wissen','kennen','helfen','kommen','gehen','hören','lesen','schreiben','sprechen','sehen','finden'],
+   dialogs:[dlg('Termin',[['A','Kommst du morgen?'],['B','Ja, ich komme um neun.']])],
+   sentences:[ pair('Heute lerne ich viel.','Today I study a lot.'), pair('Kommst du morgen?','Are you coming tomorrow?') ]
+  },
 
-      // 21–30
-      {id:21, verb:"lesen", ipa:"ˈleːzən", meaning:"to read", examples:[["Sie liest ein Buch.","She is reading a book."],["Ich lese die Zeitung.","I read the newspaper."]]},
-      {id:22, verb:"schreiben", ipa:"ˈʃʁaɪ̯bən", meaning:"to write", examples:[["Ich schreibe einen Brief.","I am writing a letter."],["Sie schreibt eine E-Mail.","She writes an email."]]},
-      {id:23, verb:"essen", ipa:"ˈʔɛsən", meaning:"to eat", examples:[["Wir essen Pizza.","We are eating pizza."],["Ich esse gern Obst.","I like eating fruit."]]},
-      {id:24, verb:"trinken", ipa:"ˈtʁɪŋkən", meaning:"to drink", examples:[["Ich trinke Wasser.","I drink water."],["Sie trinken Kaffee.","They drink coffee."]]},
-      {id:25, verb:"schlafen", ipa:"ˈʃlaːfən", meaning:"to sleep", examples:[["Das Kind schläft.","The child is sleeping."],["Ich schlafe acht Stunden.","I sleep eight hours."]]},
-      {id:26, verb:"fahren", ipa:"ˈfaːʁən", meaning:"to drive; go", examples:[["Wir fahren nach München.","We are driving to Munich."],["Ich fahre mit dem Bus.","I go by bus."]]},
-      {id:27, verb:"laufen", ipa:"ˈlaʊ̯fən", meaning:"to run; walk", examples:[["Er läuft schnell.","He runs fast."],["Ich laufe im Park.","I run in the park."]]},
-      {id:28, verb:"fliegen", ipa:"ˈfliːɡən", meaning:"to fly", examples:[["Wir fliegen nach Berlin.","We fly to Berlin."],["Das Flugzeug fliegt hoch.","The airplane flies high."]]},
-      {id:29, verb:"schwimmen", ipa:"ˈʃvɪmən", meaning:"to swim", examples:[["Ich schwimme im See.","I swim in the lake."],["Wir schwimmen jeden Morgen.","We swim every morning."]]},
-      {id:30, verb:"sitzen", ipa:"ˈzɪtsən", meaning:"to sit", examples:[["Sie sitzt auf dem Stuhl.","She sits on the chair."],["Wir sitzen im Café.","We’re sitting in the café."]]},
+  {title:'W‑questions', sub:'wer, was, wo, wann, wie, warum', topics:[{h:'W‑Fragen', body:'Wer bist du? Wo wohnst du? Wie spät ist es?'}],
+   verbs:['fragen','antworten','finden','suchen','sehen','nehmen','geben','bringen','holen','mitbringen','anrufen','aufstehen','einkaufen','zuhören','aufmachen','zumachen'],
+   dialogs:[dlg('Information',[['A','Wo ist die Haltestelle?'],['B','Da drüben, links.']])],
+   sentences:[ pair('Wo wohnst du?','Where do you live?'), pair('Wann beginnt der Film?','When does the movie start?') ]
+  },
 
-      // 31–40
-      {id:31, verb:"stehen", ipa:"ˈʃteːən", meaning:"to stand", examples:[["Ich stehe an der Haltestelle.","I’m standing at the bus stop."],["Das Buch steht im Regal.","The book stands on the shelf."]]},
-      {id:32, verb:"liegen", ipa:"ˈliːɡən", meaning:"to lie (be located)", examples:[["Das Handy liegt auf dem Tisch.","The phone lies on the table."],["Berlin liegt in Deutschland.","Berlin is located in Germany."]]},
-      {id:33, verb:"stellen", ipa:"ˈʃtɛlən", meaning:"to put/place upright", examples:[["Ich stelle die Flasche auf den Tisch.","I put the bottle on the table."],["Stell bitte den Stuhl hierher.","Please put the chair here."]]},
-      {id:34, verb:"legen", ipa:"ˈleːɡən", meaning:"to lay; place flat", examples:[["Ich lege das Buch auf den Tisch.","I lay the book on the table."],["Leg das Handy hin.","Put the phone down."]]},
-      {id:35, verb:"setzen", ipa:"ˈzɛtsən", meaning:"to set; seat", examples:[["Ich setze das Kind auf den Stuhl.","I seat the child on the chair."],["Setz dich, bitte.","Sit down, please."]]},
-      {id:36, verb:"bringen", ipa:"ˈbʁɪŋən", meaning:"to bring", examples:[["Ich bringe den Wein.","I’m bringing the wine."],["Kannst du das Buch bringen?","Can you bring the book?"]]},
-      {id:37, verb:"zeigen", ipa:"ˈtsaɪ̯ɡən", meaning:"to show", examples:[["Zeigst du mir den Weg?","Will you show me the way?"],["Er zeigt mir Fotos.","He shows me photos."]]},
-      {id:38, verb:"fragen", ipa:"ˈfʁaːɡən", meaning:"to ask", examples:[["Ich frage den Lehrer.","I ask the teacher."],["Darf ich etwas fragen?","May I ask something?"]]},
-      {id:39, verb:"antworten", ipa:"ˈantvɔʁtən", meaning:"to answer", examples:[["Er antwortet sofort.","He answers immediately."],["Bitte antworte mir!","Please answer me!"]]},
-      {id:40, verb:"versuchen", ipa:"fɛɐ̯ˈzuːxən", meaning:"to try; attempt", examples:[["Ich versuche es nochmal.","I’ll try again."],["Versuche, ruhig zu bleiben.","Try to stay calm."]]},
+  {title:'Negation', sub:'nicht / kein', topics:[{h:'nicht', body:'Negates verbs/adjectives/adverbs: Ich arbeite nicht.'},{h:'kein', body:'Negates nouns: Ich habe kein Auto.'}],
+   verbs:['haben','sein','machen','arbeiten','brauchen','mögen','wollen','können','müssen','dürfen','sollen','lieben','hassen','benutzen','versuchen','verstehen'],
+   dialogs:[dlg('Absage',[['A','Kommst du heute?'],['B','Leider nicht. Ich habe keine Zeit.']])],
+   sentences:[ pair('Ich habe kein Geld.','I have no money.'), pair('Ich komme heute nicht.','I am not coming today.') ]
+  },
 
-      // 41–50
-      {id:41, verb:"erklären", ipa:"ɛʁˈklɛːʁən", meaning:"to explain", examples:[["Er erklärt die Regeln.","He explains the rules."],["Kannst du das erklären?","Can you explain that?"]]},
-      {id:42, verb:"erzählen", ipa:"ɛʁˈtsɛːlən", meaning:"to tell; narrate", examples:[["Sie erzählt eine Geschichte.","She tells a story."],["Er erzählt von seiner Reise.","He talks about his trip."]]},
-      {id:43, verb:"verstehen", ipa:"fɛɐ̯ˈʃteːən", meaning:"to understand", examples:[["Ich verstehe dich.","I understand you."],["Wir verstehen die Aufgabe.","We understand the task."]]},
-      {id:44, verb:"bekommen", ipa:"bəˈkɔmən", meaning:"to get; receive", examples:[["Ich bekomme eine E-Mail.","I’m getting an email."],["Er bekommt ein Geschenk.","He receives a gift."]]},
-      {id:45, verb:"brauchen", ipa:"ˈbʁaʊ̯xən", meaning:"to need", examples:[["Ich brauche Hilfe.","I need help."],["Wir brauchen mehr Zeit.","We need more time."]]},
-      {id:46, verb:"benutzen", ipa:"bəˈnʊt͡sən", meaning:"to use", examples:[["Ich benutze mein Handy.","I use my phone."],["Benutze bitte die Maske.","Please use the mask."]]},
-      {id:47, verb:"suchen", ipa:"ˈzuːxən", meaning:"to look for", examples:[["Ich suche meine Tasche.","I’m looking for my bag."],["Er sucht eine Wohnung.","He is looking for an apartment."]]},
-      {id:48, verb:"öffnen", ipa:"ˈʔœfnən", meaning:"to open", examples:[["Ich öffne das Fenster.","I open the window."],["Der Laden öffnet um neun.","The shop opens at nine."]]},
-      {id:49, verb:"schließen", ipa:"ˈʃliːsən", meaning:"to close", examples:[["Bitte schließe die Tür.","Please close the door."],["Das Museum schließt um sechs.","The museum closes at six."]]},
-      {id:50, verb:"kaufen", ipa:"ˈkaʊ̯fən", meaning:"to buy", examples:[["Ich kaufe ein Auto.","I am buying a car."],["Er kauft Gemüse.","He buys vegetables."]]},
+  {title:'Review 1', sub:'Daily routine', topics:[{h:'Tagesablauf', body:'aufstehen, frühstücken, arbeiten, lernen, schlafen'}],
+   verbs:['aufstehen','frühstücken','arbeiten','lernen','einkaufen','kochen','essen','fernsehen','lesen','schreiben','spazierengehen','schlafen','aufräumen','putzen','waschen','aufhören'],
+   dialogs:[dlg('Alltag',[['A','Wann stehst du auf?'],['B','Ich stehe um sechs auf.']])],
+   sentences:[ pair('Ich stehe um sechs auf.','I get up at six.'), pair('Abends sehe ich fern.','In the evening I watch TV.') ]
+  },
 
-      // 51–60
-      {id:51, verb:"verkaufen", ipa:"fɛɐ̯ˈkaʊ̯fən", meaning:"to sell", examples:[["Sie verkauft Kleidung.","She sells clothes."],["Ich verkaufe mein Fahrrad.","I am selling my bike."]]},
-      {id:52, verb:"bezahlen", ipa:"bəˈtsaːlən", meaning:"to pay", examples:[["Ich bezahle die Rechnung.","I pay the bill."],["Kann ich mit Karte bezahlen?","Can I pay by card?"]]},
-      {id:53, verb:"kosten", ipa:"ˈkɔstən", meaning:"to cost", examples:[["Es kostet zehn Euro.","It costs ten euros."],["Wie viel kostet das?","How much does that cost?"]]},
-      {id:54, verb:"helfen", ipa:"ˈhɛlfən", meaning:"to help", examples:[["Kannst du mir helfen?","Can you help me?"],["Er hilft seiner Mutter.","He helps his mother."]]},
-      {id:55, verb:"beginnen", ipa:"bəˈɡɪnən", meaning:"to begin", examples:[["Der Film beginnt um acht.","The film starts at eight."],["Ich beginne mit der Arbeit.","I’m starting work."]]},
-      {id:56, verb:"enden", ipa:"ˈɛndən", meaning:"to end", examples:[["Der Kurs endet morgen.","The course ends tomorrow."],["Das Spiel endet um zehn.","The game ends at ten."]]},
-      {id:57, verb:"warten", ipa:"ˈvaʁtən", meaning:"to wait", examples:[["Ich warte auf den Bus.","I’m waiting for the bus."],["Bitte warte hier.","Please wait here."]]},
-      {id:58, verb:"starten", ipa:"ˈʃtaʁtən", meaning:"to start; launch", examples:[["Ich starte das Programm.","I start the program."],["Das Auto startet nicht.","The car doesn’t start."]]},
-      {id:59, verb:"stoppen", ipa:"ˈʃtɔpən", meaning:"to stop", examples:[["Ich stoppe die Maschine.","I stop the machine."],["Der Bus stoppt hier.","The bus stops here."]]},
-      {id:60, verb:"reisen", ipa:"ˈʁaɪ̯zən", meaning:"to travel", examples:[["Ich reise nach Italien.","I travel to Italy."],["Wir reisen gern im Sommer.","We like to travel in summer."]]},
+  // Week 2
+  {title:'Articles & Plurals', sub:'der/die/das + plural patterns', topics:[{h:'Articles', body:'der (m), die (f, pl), das (n).'}, {h:'Plurals', body:'der Tisch → die Tische; die Frau → die Frauen'}],
+   verbs:['kaufen','verkaufen','bezahlen','bestellen','probieren','schmecken','tragen','anziehen','ausziehen','mitnehmen','einladen','feiern','erzählen','zeigen','suchen','finden'],
+   dialogs:[dlg('Im Restaurant',[['Gast','Ich bestelle eine Suppe.'],['Kellner','Sehr gern. Möchten Sie noch etwas?']])],
+   sentences:[ pair('Das ist ein schöner Tisch.','That is a beautiful table.'), pair('Ich bestelle eine Pizza.','I order a pizza.') ]
+  },
 
-      // 61–70
-      {id:61, verb:"wohnen", ipa:"ˈvoːnən", meaning:"to live; reside", examples:[["Ich wohne in Berlin.","I live in Berlin."],["Wir wohnen zusammen.","We live together."]]},
-      {id:62, verb:"leben", ipa:"ˈleːbən", meaning:"to live (be alive)", examples:[["Ich lebe in Indien.","I live in India."],["Sie lebt gesund.","She lives healthily."]]},
-      {id:63, verb:"lieben", ipa:"ˈliːbən", meaning:"to love", examples:[["Ich liebe Musik.","I love music."],["Er liebt seine Familie.","He loves his family."]]},
-      {id:64, verb:"mögen", ipa:"ˈmøːɡən", meaning:"to like", examples:[["Ich mag Kaffee.","I like coffee."],["Magst du Schokolade?","Do you like chocolate?"]]},
-      {id:65, verb:"hassen", ipa:"ˈhasən", meaning:"to hate", examples:[["Ich hasse Lärm.","I hate noise."],["Sie hasst kaltes Wetter.","She hates cold weather."]]},
-      {id:66, verb:"fühlen", ipa:"ˈfyːlən", meaning:"to feel", examples:[["Ich fühle mich müde.","I feel tired."],["Er fühlt den Schmerz.","He feels the pain."]]},
-      {id:67, verb:"lachen", ipa:"ˈlaxən", meaning:"to laugh", examples:[["Wir lachen viel.","We laugh a lot."],["Sie lacht über den Witz.","She laughs at the joke."]]},
-      {id:68, verb:"weinen", ipa:"ˈvaɪ̯nən", meaning:"to cry", examples:[["Das Baby weint.","The baby is crying."],["Er weint vor Freude.","He cries with joy."]]},
-      {id:69, verb:"träumen", ipa:"ˈtʁɔʏ̯mən", meaning:"to dream", examples:[["Ich träume oft.","I dream often."],["Sie träumt von Urlaub.","She dreams of vacation."]]},
-      {id:70, verb:"schicken", ipa:"ˈʃɪkən", meaning:"to send", examples:[["Ich schicke dir den Link.","I’ll send you the link."],["Er schickt eine Nachricht.","He sends a message."]]},
+  {title:'Accusative', sub:'den/einen; mich, dich…', topics:[{h:'Akkusativ', body:'Ich sehe <b style="color:#9bd">den</b> Mann. Ich habe <b style="color:#9bd">einen</b> Hund.'}],
+   verbs:['sehen','treffen','besuchen','brauchen','haben','nehmen','kaufen','tragen','finden','suchen','mögen','lieben','hassen','öffnen','schließen','benutzen'],
+   dialogs:[dlg('Einkauf',[['A','Ich brauche einen Laptop.'],['B','Ich habe einen guten Tipp.']])],
+   sentences:[ pair('Ich sehe den Bus.','I see the bus.'), pair('Er hat einen Termin.','He has an appointment.') ]
+  },
 
-      // 71–80
-      {id:71, verb:"erhalten", ipa:"ɛʁˈhaltən", meaning:"to receive; obtain", examples:[["Ich erhalte eine E-Mail.","I receive an email."],["Er erhält den Preis heute.","He receives the prize today."]]},
-      {id:72, verb:"senden", ipa:"ˈzɛndən", meaning:"to send; broadcast", examples:[["Wir senden die Datei.","We send the file."],["Der Sender sendet Nachrichten.","The station broadcasts news."]]},
-      {id:73, verb:"bauen", ipa:"ˈbaʊ̯ən", meaning:"to build", examples:[["Wir bauen ein Haus.","We are building a house."],["Sie bauen eine Brücke.","They are building a bridge."]]},
-      {id:74, verb:"reparieren", ipa:"ʁepaˈʁiːʁən", meaning:"to repair; fix", examples:[["Ich repariere das Fahrrad.","I’m fixing the bike."],["Die Werkstatt repariert das Auto.","The shop repairs the car."]]},
-      {id:75, verb:"putzen", ipa:"ˈpʊt͡sən", meaning:"to clean", examples:[["Ich putze die Wohnung.","I clean the apartment."],["Er putzt das Bad.","He cleans the bathroom."]]},
-      {id:76, verb:"waschen", ipa:"ˈvaʃən", meaning:"to wash", examples:[["Ich wasche meine Hände.","I wash my hands."],["Sie wäscht die Kleidung.","She washes the clothes."]]},
-      {id:77, verb:"kochen", ipa:"ˈkɔxən", meaning:"to cook", examples:[["Ich koche Nudeln.","I’m cooking pasta."],["Meine Mutter kocht sehr gut.","My mother cooks very well."]]},
-      {id:78, verb:"backen", ipa:"ˈbakən", meaning:"to bake", examples:[["Sie backt einen Kuchen.","She is baking a cake."],["Ich backe Brot.","I bake bread."]]},
-      {id:79, verb:"schneiden", ipa:"ˈʃnaɪ̯dən", meaning:"to cut", examples:[["Ich schneide Gemüse.","I’m cutting vegetables."],["Der Friseur schneidet Haare.","The hairdresser cuts hair."]]},
-      {id:80, verb:"sollen", ipa:"ˈzɔlən", meaning:"should; ought to", examples:[["Ich soll lernen.","I should study."],["Du sollst pünktlich sein.","You should be on time."]]},
+  {title:'Accusative Pronouns', sub:'mich/dich/ihn/sie/es/uns/euch/Sie', topics:[{h:'Pronouns', body:'Ich liebe <b>dich</b>. Er kennt <b>sie</b>.'}],
+   verbs:['lieben','kennen','einladen','treffen','anrufen','mitnehmen','fragen','verstehen','helfen','sehen','hören','lesen','schreiben','erzählen','sagen','bringen'],
+   dialogs:[dlg('Freunde',[['A','Ich rufe dich später an.'],['B','Okay, danke!']])],
+   sentences:[ pair('Ich sehe dich morgen.','I see you tomorrow.'), pair('Er versteht sie.','He understands her.') ]
+  },
 
-      // 81–90
-      {id:81, verb:"dürfen", ipa:"ˈdʏʁfən", meaning:"may; be allowed to", examples:[["Du darfst hier parken.","You may park here."],["Darf ich reinkommen?","May I come in?"]]},
-      {id:82, verb:"wollen", ipa:"ˈvɔlən", meaning:"to want (to)", examples:[["Ich will Deutsch lernen.","I want to learn German."],["Willst du mitkommen?","Do you want to come along?"]]},
-      {id:83, verb:"ausgeben", ipa:"ˈaʊ̯sɡeːbən", meaning:"to spend (money)", examples:[["Ich gebe zu viel Geld aus.","I spend too much money."],["Wir geben 20 Euro aus.","We spend 20 euros."]]},
-      {id:84, verb:"mieten", ipa:"ˈmiːtən", meaning:"to rent (from)", examples:[["Ich miete eine Wohnung.","I rent an apartment."],["Wir mieten ein Auto.","We rent a car."]]},
-      {id:85, verb:"vermieten", ipa:"fɛɐ̯ˈmiːtən", meaning:"to rent out (to)", examples:[["Ich vermiete mein Zimmer.","I rent out my room."],["Die Firma vermietet Autos.","The company rents out cars."]]},
-      {id:86, verb:"bestellen", ipa:"bəˈʃtɛlən", meaning:"to order", examples:[["Ich bestelle eine Pizza.","I order a pizza."],["Wir bestellen online.","We order online."]]},
-      {id:87, verb:"liefern", ipa:"ˈliːfɐn", meaning:"to deliver", examples:[["Der Kurier liefert das Paket.","The courier delivers the parcel."],["Wir liefern morgen.","We deliver tomorrow."]]},
-      {id:88, verb:"feiern", ipa:"ˈfaɪ̯ɐn", meaning:"to celebrate", examples:[["Wir feiern heute Abend.","We’re celebrating tonight."],["Sie feiern Geburtstag.","They celebrate a birthday."]]},
-      {id:89, verb:"teilnehmen", ipa:"ˈtaɪ̯lˌneːmən", meaning:"to take part", examples:[["Ich nehme am Kurs teil.","I take part in the course."],["Viele nehmen an der Konferenz teil.","Many take part in the conference."]]},
-      {id:90, verb:"vorbereiten", ipa:"ˈfoːɐ̯bəˌʁaɪ̯tən", meaning:"to prepare", examples:[["Ich bereite das Essen vor.","I prepare the food."],["Sie bereitet sich auf die Prüfung vor.","She prepares for the exam."]]},
+  {title:'Modal verbs', sub:'können/müssen/wollen… + infinitive', topics:[{h:'Modal + V', body:'Ich <b>kann</b> heute nicht kommen. Wir <b>müssen</b> arbeiten.'}],
+   verbs:['können','müssen','wollen','dürfen','sollen','mögen','fahren','gehen','kommen','lernen','arbeiten','sprechen','schreiben','lesen','sehen','spielen'],
+   dialogs:[dlg('Pflichten',[['A','Ich muss heute lange arbeiten.'],['B','Dann kannst du morgen kommen.']])],
+   sentences:[ pair('Ich kann heute nicht.','I cannot today.'), pair('Wir müssen jetzt gehen.','We must go now.') ]
+  },
 
-      // 91–100
-      {id:91, verb:"vorstellen", ipa:"ˈfoːɐ̯ˌʃtɛlən", meaning:"to introduce; present", examples:[["Darf ich mich vorstellen?","May I introduce myself?"],["Ich stelle mein Projekt vor.","I present my project."]]},
-      {id:92, verb:"anmelden", ipa:"ˈanˌmɛldən", meaning:"to register; log in", examples:[["Ich melde mich im Portal an.","I log into the portal."],["Er meldet sich für den Kurs an.","He registers for the course."]]},
-      {id:93, verb:"abmelden", ipa:"ˈapˌmɛldən", meaning:"to log out; deregister", examples:[["Ich melde mich ab.","I log out."],["Er meldet das Auto ab.","He deregisters the car."]]},
-      {id:94, verb:"herunterladen", ipa:"heˈʁʊntɐˌlaːdən", meaning:"to download", examples:[["Ich lade die Datei herunter.","I download the file."],["Er lädt Bilder herunter.","He downloads images."]]},
-      {id:95, verb:"hochladen", ipa:"ˈhoːxˌlaːdən", meaning:"to upload", examples:[["Ich lade das Video hoch.","I upload the video."],["Sie lädt Fotos hoch.","She uploads photos."]]},
-      {id:96, verb:"drucken", ipa:"ˈdʁʊkən", meaning:"to print", examples:[["Ich drucke das Dokument.","I print the document."],["Der Drucker druckt langsam.","The printer prints slowly."]]},
-      {id:97, verb:"kopieren", ipa:"koˈpiːʁən", meaning:"to copy", examples:[["Ich kopiere den Text.","I copy the text."],["Er kopiert die Datei.","He copies the file."]]},
-      {id:98, verb:"teilen", ipa:"ˈtaɪ̯lən", meaning:"to share; divide", examples:[["Ich teile den Link.","I share the link."],["Wir teilen die Kosten.","We share the costs."]]},
-      {id:99, verb:"können", ipa:"ˈkœnən", meaning:"can; be able to", examples:[["Ich kann schwimmen.","I can swim."],["Wir können später sprechen.","We can talk later."]]},
-      {id:100, verb:"müssen", ipa:"ˈmʏsən", meaning:"must; have to", examples:[["Wir müssen gehen.","We have to go."],["Ich muss heute arbeiten.","I must work today."]]}
-    ];
+  {title:'Dative', sub:'dem/einem; mir/dir/…', topics:[{h:'Dativ', body:'Ich helfe <b>dem</b> Freund. Ich gebe <b>dem</b> Kind ein Buch.'}],
+   verbs:['helfen','danken','gratulieren','gehören','folgen','passen','gefallen','schmecken','antworten','glauben','erzählen','zeigen','geben','schenken','bringen','mitteilen'],
+   dialogs:[dlg('Geschenk',[['A','Ich gebe dem Kind ein Spiel.'],['B','Das gefällt ihm sehr!']])],
+   sentences:[ pair('Ich helfe dem Mann.','I help the man.'), pair('Das passt mir.','That fits me.') ]
+  },
 
-    // ===== Render =====
-    const list = document.getElementById("list");
-    const count = document.getElementById("count");
+  {title:'Two‑case preps', sub:'an, auf, in… (Akk/Dativ)', topics:[{h:'Wechselpräpositionen', body:'in, an, auf, unter, über… Akk=movement (Wohin?), Dat=location (Wo?)'}],
+   verbs:['legen','stellen','setzen','hängen','liegen','stehen','sitzen','gehen','kommen','fahren','bringen','mitbringen','abholen','aufmachen','zumachen','einräumen'],
+   dialogs:[dlg('Wohin/Wo',[['A','Wohin stellst du den Stuhl?'],['B','Ich stelle ihn an den Tisch.']])],
+   sentences:[ pair('Das Buch liegt auf dem Tisch.','The book lies on the table.'), pair('Ich hänge das Bild an die Wand.','I hang the picture on the wall.') ]
+  },
 
-    function render(items){
-      list.innerHTML = items.map(v=>{
-        const verbEasy = easyDePronounce(v.verb);
-        const examples = v.examples.map(([de,en])=>{
-          const easy = easyDePronounce(de);
-          // sentence row with right-side easy phonetic
-          return `
-            <div class="ex-row">
-              <div class="ex-left">
-                <b>Beispiel:</b> ${de}
-                <button class="say" onclick="speak('${de.replace(/'/g,"\\'")}')">🔊</button>
-                <span style="margin-left:6px;color:var(--muted)">${en}</span>
-              </div>
-              <div class="ex-right">👄 ${easy}</div>
-            </div>
-          `;
-        }).join("");
-        return `
-          <section class="verb">
-            <div class="verb-head">
-              <h3 class="verb-title">${v.id}. ${v.verb} <span class="meaning">— ${v.meaning}</span></h3>
-              <div class="rightline">
-                <button class="say" onclick="speak('${v.verb.replace(/'/g,"\\'")}')">🔊 /<span class="ipa">${v.ipa}</span>/</button>
-                <span class="easy">👄 ${verbEasy}</span>
-              </div>
-            </div>
-            <div class="examples">
-              ${examples}
-            </div>
-          </section>
-        `;
-      }).join("");
+  {title:'Review 2', sub:'Shopping & Family', topics:[{h:'Themen', body:'Einkaufen, Familie, Kleidung, Farben'}],
+   verbs:['kaufen','verkaufen','tragen','anziehen','ausziehen','suchen','finden','zeigen','erzählen','lieben','mögen','mieten','vermieten','bezahlen','bestellen','probieren'],
+   dialogs:[dlg('Kleidung',[['A','Passt die Jacke?'],['B','Ja, sie passt mir.']])],
+   sentences:[ pair('Ich suche eine blaue Hose.','I am looking for blue pants.') ]
+  },
 
-      count.textContent = `${items.length} / ${verbs.length} shown`;
-    }
+  // Week 3
+  {title:'Possessives', sub:'mein/dein/sein/ihr/unser/euer/Ihr', topics:[{h:'Possessive', body:'mein Vater, deine Mutter, sein Auto, unsere Wohnung'}],
+   verbs:['haben','gehören','tragen','zeigen','geben','nehmen','bringen','mitbringen','kaufen','bezahlen','benutzen','brauchen','wollen','mögen','lieben','suchen'],
+   dialogs:[dlg('Familie',[['A','Ist das dein Bruder?'],['B','Ja, das ist mein Bruder.']])],
+   sentences:[ pair('Ist das dein Buch?','Is that your book?') ]
+  },
 
-    render(verbs);
+  {title:'Adj. endings I', sub:'ein schöner Tag…', topics:[{h:'Adjektive', body:'Nach unbestimmtem Artikel: ein schöner Tag / eine schöne Stadt / ein schönes Haus.'}],
+   verbs:['sein','werden','finden','halten','machen','scheinen','aussehen','bleiben','wirken','fühlen','schmecken','klingen','heißen','nennen','zeigen','beschreiben'],
+   dialogs:[dlg('Beschreibung',[['A','Das ist ein schönes Zimmer.'],['B','Ja, sehr hell.']])],
+   sentences:[ pair('Das ist ein schönes Haus.','That is a beautiful house.') ]
+  },
 
-    // Search
-    document.getElementById("search").addEventListener("input", e=>{
-      const q = e.target.value.trim().toLowerCase();
-      if(!q) return render(verbs);
-      const filtered = verbs.filter(v =>
-        v.verb.toLowerCase().includes(q) ||
-        v.meaning.toLowerCase().includes(q) ||
-        v.examples.some(([de,en])=> de.toLowerCase().includes(q) || en.toLowerCase().includes(q))
-      );
-      render(filtered);
+  {title:'Comparisons', sub:'größer, am größten', topics:[{h:'Komparativ/Superlativ', body:'groß – größer – am größten; gut – besser – am besten'}],
+   verbs:['sein','werden','finden','mögen','lieben','wollen','kaufen','bezahlen','vergleichen','messen','steigen','sinken','verbessern','verschlechtern','ändern','scheinen'],
+   dialogs:[dlg('Vergleich',[['A','Dieser Weg ist kürzer.'],['B','Aber der andere ist besser.']])],
+   sentences:[ pair('Heute ist es wärmer.','Today it is warmer.') ]
+  },
+
+  {title:'Time expressions', sub:'um, am, im; heute, morgen', topics:[{h:'Zeit', body:'um 9 Uhr; am Montag; im Juni; heute, morgen, gestern'}],
+   verbs:['beginnen','enden','dauern','warten','kommen','gehen','fahren','planen','vorhaben','treffen','anrufen','aufstehen','einschlafen','aufwachen','vorbereiten','einladen'],
+   dialogs:[dlg('Termin 2',[['A','Treffen wir uns am Freitag?'],['B','Ja, um 18 Uhr.']])],
+   sentences:[ pair('Ich komme am Montag.','I come on Monday.') ]
+  },
+
+  {title:'Separable verbs', sub:'aufstehen, einkaufen…', topics:[{h:'Trennbar', body:'Ich stehe um 6 Uhr auf. Er kauft heute ein.'}],
+   verbs:['aufstehen','einkaufen','zuhören','anrufen','mitkommen','mitnehmen','aufmachen','zumachen','aufräumen','einladen','fernsehen','zurückkommen','zurückgeben','aufschreiben','vorstellen','vorbereiten'],
+   dialogs:[dlg('Morgenroutine',[['A','Stehst du früh auf?'],['B','Ja, um sechs.']])],
+   sentences:[ pair('Wir kaufen heute ein.','We are shopping today.') ]
+  },
+
+  {title:'Prepositions (common)', sub:'mit, ohne, für, bei, nach, zu…', topics:[{h:'Präpositionen', body:'mit (Dat), ohne (Akk), für (Akk), bei (Dat), nach (Dat), zu (Dat)'}],
+   verbs:['gehen','fahren','kommen','reisen','arbeiten','wohnen','leben','helfen','sprechen','treffen','suchen','finden','bezahlen','warten','denken','glauben'],
+   dialogs:[dlg('Wegbeschreibung',[['A','Ich gehe mit dir zum Bahnhof.'],['B','Super, danke!']])],
+   sentences:[ pair('Ich fahre nach Berlin.','I go to Berlin.') ]
+  },
+
+  {title:'Review 3', sub:'Family, work, travel', topics:[{h:'Themen', body:'Familie, Arbeit, Reisen — Rollenspiele'}],
+   verbs:['reisen','fahren','kommen','mitkommen','umsteigen','einsteigen','aussteigen','einladen','mitnehmen','helfen','fragen','antworten','zeigen','erzählen','warten','planen'],
+   dialogs:[dlg('Am Bahnhof',[['A','Wann fährt der Zug nach Frankfurt?'],['B','Um 9:30 Uhr, Gleis 3.']])],
+   sentences:[ pair('Wir steigen in Berlin um.','We change trains in Berlin.') ]
+  },
+
+  // Week 4
+  {title:'Perfekt I', sub:'haben/sein + Partizip II', topics:[{h:'Perfekt', body:'Ich habe gearbeitet. Ich bin gekommen.'}],
+   verbs:['machen','lernen','arbeiten','gehen','kommen','fahren','reisen','bleiben','trinken','essen','lesen','schreiben','sehen','sprechen','spielen','kaufen'],
+   dialogs:[dlg('Gestern',[['A','Was hast du gestern gemacht?'],['B','Ich habe gelernt und Sport gemacht.']])],
+   sentences:[ pair('Ich habe Kaffee getrunken.','I drank coffee.'), pair('Ich bin früh gekommen.','I came early.') ]
+  },
+
+  {title:'Perfekt II', sub:'more participles', topics:[{h:'Partizip', body:'ge- + Stamm + -t/-en; trennbar: aufGESTANDEN'}],
+   verbs:['aufstehen','einkaufen','anrufen','mitkommen','mitnehmen','aufmachen','zumachen','aufräumen','einladen','fernsehen','zurückkommen','zurückgeben','aufschreiben','vorstellen','vorbereiten','helfen'],
+   dialogs:[dlg('Erfahrung',[['A','Hast du ihn angerufen?'],['B','Ja, ich habe ihn gestern angerufen.']])],
+   sentences:[ pair('Ich habe eingekauft.','I did the shopping.'), pair('Wir sind früh aufgestanden.','We got up early.') ]
+  },
+
+  {title:'Future basics', sub:'werden + Infinitiv', topics:[{h:'Futur I', body:'Ich werde morgen arbeiten.'}],
+   verbs:['werden','arbeiten','lernen','fahren','gehen','kommen','sehen','treffen','besuchen','kaufen','planen','vorhaben','sprechen','schreiben','lesen','spielen'],
+   dialogs:[dlg('Planung',[['A','Was wirst du morgen machen?'],['B','Ich werde lernen.']])],
+   sentences:[ pair('Wir werden zusammen kommen.','We will come together.') ]
+  },
+
+  {title:'Connectors', sub:'und, aber, oder, denn, weil, dass', topics:[{h:'Konjunktionen', body:'Verb-end with weil, dass: Ich bleibe zu Hause, weil ich müde bin.'}],
+   verbs:['bleiben','gehen','kommen','arbeiten','lernen','helfen','brauchen','mögen','wollen','müssen','können','dürfen','sollen','sehen','sprechen','denken'],
+   dialogs:[dlg('Begründung',[['A','Ich komme später, weil ich arbeite.'],['B','Alles klar.']])],
+   sentences:[ pair('Ich denke, dass er kommt.','I think that he is coming.') ]
+  },
+
+  {title:'Imperative', sub:'Komm! Gehen wir!', topics:[{h:'Imperativ', body:'du: Komm! ihr: Kommt! wir/Sie: Gehen wir!/Gehen Sie!'}],
+   verbs:['kommen','gehen','warten','helfen','lesen','schreiben','sprechen','öffnen','schließen','aufstehen','aufmachen','zuhören','ansehen','mitkommen','mitnehmen','aufräumen'],
+   dialogs:[dlg('Anweisungen',[['A','Bitte öffne das Fenster.'],['B','Gern!']])],
+   sentences:[ pair('Komm hierher!','Come here!') ]
+  },
+
+  {title:'Situations', sub:'Doctor / Post / Restaurant', topics:[{h:'Arzt', body:'Ich habe Kopfschmerzen. Ich brauche einen Termin.'},{h:'Post', body:'Ich möchte ein Paket schicken.'},{h:'Restaurant', body:'Ich hätte gern die Speisekarte.'}],
+   verbs:['brauchen','haben','sein','fühlen','schmerzen','schicken','bekommen','bestellen','bezahlen','probieren','schmecken','helfen','geben','nehmen','bringen','zeigen'],
+   dialogs:[dlg('Beim Arzt',[['Patient','Ich habe Fieber.'],['Arzt','Seit wann?'],['Patient','Seit gestern.']])],
+   sentences:[ pair('Ich brauche einen Termin.','I need an appointment.') ]
+  },
+
+  {title:'Fillers & Small talk', sub:'also, na ja, genau…', topics:[{h:'Redemittel', body:'also, na ja, genau, vielleicht, eigentlich, übrigens'}],
+   verbs:['reden','sprechen','erzählen','fragen','antworten','denken','glauben','finden','sehen','treffen','kennen','mögen','lieben','arbeiten','lernen','spielen'],
+   dialogs:[dlg('Small Talk',[['A','Schönes Wetter, oder?'],['B','Ja, genau!']])],
+   sentences:[ pair('Also, ich glaube, das ist gut.','So, I think that is good.') ]
+  },
+
+  {title:'Final Review', sub:'All skills + test-yourself', topics:[{h:'Prüfung', body:'Hören, Sprechen, Lesen, Schreiben — Rollenspiele + Wortschatztest.'}],
+   verbs:['sein','haben','werden','können','müssen','wollen','gehen','kommen','machen','sprechen','sehen','nehmen','geben','helfen','kaufen','arbeiten'],
+   dialogs:[dlg('Wohnung mieten',[['A','Ist die Wohnung noch frei?'],['B','Ja, ab nächsten Monat.']])],
+   sentences:[ pair('Ich habe viel gelernt.','I learned a lot.') ]
+  }
+];
+
+/***********************
+ *  RENDERING LOGIC    *
+ ***********************/
+const daysNav = document.getElementById('days');
+DAYS.forEach((d, i)=>{
+  const a = document.createElement('a');
+  a.href = '#'; a.className = 'day'; a.dataset.day = i+1;
+  a.innerHTML = `<div style="font-weight:700">Day ${i+1}</div><span class="tag">${d.title}</span>`;
+  a.addEventListener('click', e=>{e.preventDefault(); loadDay(i+1); setActive(i+1);});
+  daysNav.appendChild(a);
+});
+function setActive(n){
+  [...daysNav.querySelectorAll('.day')].forEach((el,idx)=>{
+    el.classList.toggle('active', idx===n-1);
+  });
+}
+const gramEl = document.getElementById('grammar');
+function renderGrammar(day){
+  gramEl.innerHTML = '';
+  day.topics.forEach(t=>{
+    const det = document.createElement('details');
+    det.open = true;
+    det.innerHTML = `<summary>${t.h}</summary><div class="muted" style="margin-top:6px">${t.body}</div>`;
+    gramEl.appendChild(det);
+  });
+}
+function presentFor(v){
+  if(v.class==='irr' && IRR[v.inf]) return IRR[v.inf];
+  if(v.class==='sep' && v.base){ return combineSeparable(v.prefix, v.base); }
+  if(v.class==='sepirr' && v.base){
+    const base = IRR[v.base] || conjRegular(v.base);
+    const o={}; for(const k of ['ich','du','er','wir','ihr','sie']){ o[k] = base[k] + ' ' + v.prefix; } return o;
+  }
+  if(v.class==='comp'){
+    const base = conjRegular('gehen');
+    const o={}; for(const k of ['ich','du','er','wir','ihr','sie']){ o[k] = base[k] + ' spazieren'; } return o;
+  }
+  return conjRegular(v.inf);
+}
+function rowVerb(v){
+  const p = presentFor(v);
+  const tr = document.createElement('tr');
+  tr.innerHTML = `<td><b>${v.inf}</b></td><td class="en">${v.en}</td>`+
+  `<td>${p.ich}</td><td>${p.du}</td><td>${p.er}</td><td>${p.wir}</td><td>${p.ihr}</td><td>${p.sie}</td>`+
+  `<td><button class="speak" data-text="${v.inf}" data-lang="de">🔊</button></td>`;
+  return tr;
+}
+function exampleFor(v){
+  const p = presentFor(v).ich;
+  let de, en;
+  if(v.inf==='sein'){ de='Ich bin müde.'; en='I am tired.'; }
+  else if(v.inf==='haben'){ de='Ich habe Zeit.'; en='I have time.'; }
+  else if(v.class==='sep' || v.class==='sepirr'){ de=`Ich ${p}.`; en=`I ${v.en.replace('to ','')}.`; }
+  else { de=`Ich ${p}.`; en=`I ${v.en.replace('to ','')}.`; }
+  return {de,en};
+}
+function renderVerbsOfDay(day){
+  const tb = document.querySelector('#verbTable tbody'); tb.innerHTML='';
+  const list = day.verbs.map(inf => VERB_DB.find(v=>v.inf===inf)).filter(Boolean);
+  document.getElementById('verbCount').textContent = `${list.length} verbs`;
+  list.forEach(v=> tb.appendChild(rowVerb(v)) );
+}
+function escapeHtml(t){return t.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+function renderSentences(day){
+  const box = document.getElementById('sentences'); box.innerHTML='';
+  const chosen = [...day.sentences];
+  day.verbs.slice(0,6).forEach(inf=>{ const v = VERB_DB.find(x=>x.inf===inf); if(v) chosen.push(exampleFor(v)); });
+  chosen.forEach((s,i)=>{
+    const item = document.createElement('div'); item.className='item';
+    item.innerHTML = `<div class="row"><div><div class="de">${i+1}. ${s.de}</div><div class="en">${s.en}</div></div>
+      <div>
+        <button class="speak" data-text="${escapeHtml(s.de)}" data-lang="de">🔊 DE</button>
+        <button class="speak" data-text="${escapeHtml(s.en)}" data-lang="en">🔊 EN</button>
+        <button class="speak" data-both="${escapeHtml(s.de)}|||${escapeHtml(s.en)}">🔊 DE→EN</button>
+      </div></div>`;
+    box.appendChild(item);
+  });
+}
+function renderDialogs(day){
+  const box = document.getElementById('dialogs'); box.innerHTML='';
+  day.dialogs.forEach(d=>{
+    const det = document.createElement('details'); det.open=false;
+    let inner = `<summary>${d.title}</summary>`;
+    d.lines.forEach((ln, idx)=>{
+      const who = ln[0]; const text = ln[1];
+      inner += `<div class="row" style="margin-top:8px"><div><b>${who}:</b> <span class="de">${text}</span></div>
+        <div><button class="speak" data-text="${escapeHtml(text)}" data-lang="de">🔊</button></div></div>`;
     });
-  </script>
+    det.innerHTML = inner;
+    box.appendChild(det);
+  });
+}
+function loadDay(n){
+  const d = DAYS[n-1];
+  document.getElementById('dayNo').textContent = n;
+  document.getElementById('dayTitle').textContent = d.title;
+  document.getElementById('daySub').textContent = d.sub;
+  renderGrammar(d);
+  renderVerbsOfDay(d);
+  renderSentences(d);
+  renderDialogs(d);
+}
+function setUpEvents(){
+  document.addEventListener('click', (e)=>{
+    const b = e.target.closest('.speak');
+    if(!b) return;
+    if(b.dataset.both){
+      const [de,en] = b.dataset.both.split('|||');
+      speakSeq([{text:decode(de), lang:'de'}, {text:decode(en), lang:'en'}]);
+    }else{
+      speak(b.dataset.text? decode(b.dataset.text):'', b.dataset.lang||'de');
+    }
+  });
+  document.getElementById('playDay').addEventListener('click', ()=>{
+    const items = [...document.querySelectorAll('#sentences .item .de')].map(el=>el.textContent.replace(/^\\d+\\.\\s*/,'').trim());
+    speakSeq(items.map(t=>({text:t, lang:'de'})));
+  });
+  document.getElementById('stopAll').addEventListener('click', ()=> speechSynthesis.cancel());
+  document.getElementById('btnSearch').addEventListener('click', doSearch);
+  document.getElementById('q').addEventListener('keydown', (e)=>{ if(e.key==='Enter') doSearch(); });
+}
+function decode(t){ const d=document.createElement('textarea'); d.innerHTML=t; return d.value; }
+
+// TTS
+let VOICES=[];
+function loadVoices(){
+  VOICES = speechSynthesis.getVoices();
+  const deSel = document.getElementById('deVoice');
+  const enSel = document.getElementById('enVoice');
+  function fill(sel, filter){
+    const cur = sel.value;
+    sel.innerHTML='';
+    VOICES.filter(filter).forEach(v=>{
+      const opt = document.createElement('option');
+      opt.value = v.name; opt.textContent = `${v.name} (${v.lang})`;
+      sel.appendChild(opt);
+    });
+    if(cur) sel.value = cur;
+  }
+  fill(deSel, v => (v.lang||'').toLowerCase().startsWith('de'));
+  fill(enSel, v => (v.lang||'').toLowerCase().startsWith('en'));
+}
+speechSynthesis.onvoiceschanged = loadVoices;
+function speak(text, lang){
+  const u = new SpeechSynthesisUtterance(text);
+  const rate = parseFloat(document.getElementById('rate').value||'1');
+  const pitch = parseFloat(document.getElementById('pitch').value||'1');
+  u.rate=rate; u.pitch=pitch;
+  u.lang=(lang==='de'?'de-DE':'en-US');
+  const sel = (lang==='de'?document.getElementById('deVoice'):document.getElementById('enVoice'));
+  const name = sel.value; if(name){ const v = VOICES.find(v=>v.name===name); if(v) u.voice=v; }
+  speechSynthesis.speak(u);
+}
+function speakSeq(arr){
+  if(!arr.length) return;
+  const [first, ...rest] = arr;
+  const u = new SpeechSynthesisUtterance(first.text);
+  u.lang = first.lang==='de'?'de-DE':'en-US';
+  const rate = parseFloat(document.getElementById('rate').value||'1');
+  const pitch = parseFloat(document.getElementById('pitch').value||'1');
+  u.rate=rate; u.pitch=pitch;
+  const sel = (first.lang==='de'?document.getElementById('deVoice'):document.getElementById('enVoice'));
+  const name = sel.value; if(name){ const v = VOICES.find(v=>v.name===name); if(v) u.voice=v; }
+  u.onend = ()=> speakSeq(rest);
+  speechSynthesis.speak(u);
+}
+
+// Simple search: jump to day that contains verb or sentence substring
+function doSearch(){
+  const q = (document.getElementById('q').value||'').toLowerCase().trim();
+  if(!q){ return; }
+  // search verbs
+  for(let i=0;i<DAYS.length;i++){
+    const d = DAYS[i];
+    const hasVerb = d.verbs.some(inf=> inf.toLowerCase().includes(q));
+    const hasSent = d.sentences.some(s=> s.de.toLowerCase().includes(q) || s.en.toLowerCase().includes(q));
+    if(hasVerb || hasSent){
+      loadDay(i+1); setActive(i+1); return;
+    }
+  }
+  alert('No match in this curriculum. Try another term.');
+}
+
+// Init
+loadVoices();
+setActive(1);
+loadDay(1);
+setUpEvents();
+</script>
 </body>
 </html>
